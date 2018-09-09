@@ -17,7 +17,10 @@ char *yytext;
 
 %%
 
-programa: sentencia { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
+start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
+		;
+
+programa: sentencia 
 		| programa sentencia
 		;
 		
