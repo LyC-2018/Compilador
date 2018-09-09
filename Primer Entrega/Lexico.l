@@ -26,6 +26,13 @@ CADENA			\"({LETRA}|{DIGITO}|!|¡|>|:|<|[ ]|+|@|%|#|&|°|´|^|`|?|¿|~|/|\|-|_|.
 "="			    { return ASIG; }
 "("				{ return P_A; }
 ")"				{ return P_C; }
+"WHILE"         { return WHILE; } 
+"ENDWHILE"      { return ENDWHILE; }
+
+">"             { return MAYOR; }
+"<"             { return MENOR; }
+"=="            { return IGUAL; }
+"!="            { return DISTINTO; }
 
 {DIGITO}+		{ yylval = atoi(yytext); return CTE; }
 {ID}			{ printf("ID es: %s\n",yytext);return ID;}

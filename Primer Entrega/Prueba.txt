@@ -1,1 +1,5 @@
 a = (5 * 8) - z
+
+WHILE (5 < a)
+    b = (5 / a - 2) + 1 
+ENDWHILE

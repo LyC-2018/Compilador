@@ -11,18 +11,31 @@ char *yytext;
 
 %token ID CTE CADENA
 %token ASIG OP_SUMA OP_RESTA OP_MULT OP_DIV
+%token MENOR MAYOR IGUAL DISTINTO
+%token WHILE ENDWHILE
 %token P_A P_C
 
 %%
+
 programa: sentencia { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
 		| programa sentencia
 		;
 		
 sentencia: asignacion { printf("Asignacion OK\n"); }
+		| iteracion { printf("Iteracion OK\n"); }
 		 ;
 		 
 asignacion: ID ASIG expresion
 		  ;
+
+iteracion: WHILE P_A condicion P_C programa ENDWHILE
+		;
+
+condicion: factor MENOR factor { printf("Condicion menor OK\n"); }
+		| factor MAYOR factor { printf("Condicion mayor OK\n"); }
+		| factor IGUAL factor { printf("Condicion igual OK\n"); }
+		| factor DISTINTO factor { printf("Condicion distinto OK\n"); }
+		; 
 		  
 expresion: expresion OP_SUMA termino { printf("Suma OK\n"); }
 		 | expresion OP_RESTA termino { printf("Resta OK\n"); }
