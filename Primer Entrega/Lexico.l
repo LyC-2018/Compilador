@@ -16,6 +16,8 @@ LETRA			[a-zA-Z]
 CTE				{DIGITO}*(.{DIGITO}+)?
 ID				{LETRA}({LETRA}|{DIGITO}|_)*
 CADENA			\"({LETRA}|{DIGITO}|!|¡|>|:|<|[ ]|+|@|%|#|&|°|´|^|`|?|¿|~|/|\|-|_|.|;)*\"
+WHILE           [Ww][Hh][Ii][Ll][Ee]
+ENDWHILE        [Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]
 
 %%
 
@@ -26,8 +28,8 @@ CADENA			\"({LETRA}|{DIGITO}|!|¡|>|:|<|[ ]|+|@|%|#|&|°|´|^|`|?|¿|~|/|\|-|_|.
 "="			    { return ASIG; }
 "("				{ return P_A; }
 ")"				{ return P_C; }
-"WHILE"         { return WHILE; } 
-"ENDWHILE"      { return ENDWHILE; }
+{WHILE}         { return WHILE; } 
+{ENDWHILE}      { return ENDWHILE; }
 
 ">"             { return MAYOR; }
 "<"             { return MENOR; }
