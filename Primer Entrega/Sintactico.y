@@ -34,10 +34,11 @@ termino: termino OP_MULT factor { printf("Multiplicacion OK\n"); }
 	   | factor
 	   ;
 	   
-factor : ID
+factor: ID
 	   | CTE {$1 = yylval ;printf("ENTERO es: %d\n", yylval);}
 	   | P_A expresion P_C
 	   ;
+
 %%
 
 int main(int argc,char *argv[])
