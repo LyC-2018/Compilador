@@ -1,5 +1,8 @@
 a = (5 * 8) - z
 
+AVG([2,a+b,c*(d+e),48])
+AVG([2.3])
+
 WHILE (5.5 < a AND 1 == 1)
     b = (5 / a - 2) + 1 
 ENDWHILE

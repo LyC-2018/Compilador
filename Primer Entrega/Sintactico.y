@@ -27,7 +27,7 @@ char *strVal;
 %token <strVal>ID <intVal>CTE_INT <strVal>CTE_STRING <realVal>CTE_REAL
 %token ASIG OP_SUMA OP_RESTA OP_MULT OP_DIV
 %token MENOR MAYOR IGUAL DISTINTO MENOR_IGUAL MAYOR_IGUAL
-%token INLIST
+%token INLIST AVG
 %token WHILE ENDWHILE
 %token IF ELSE ENDIF
 %token P_A P_C C_A C_C
@@ -46,6 +46,7 @@ programa: sentencia
 sentencia: asignacion { printf("Asignacion OK\n"); }
 		 | iteracion { printf("Iteracion OK\n"); }
 		 | decision { printf("Seleccion OK\n"); }
+		 | average { printf("AVG OK\n"); }
 		 ;
 		 
 asignacion: ID ASIG expresion
@@ -69,15 +70,21 @@ comparacion: expresion MENOR expresion { printf("Condicion menor OK\n"); }
 		   | expresion MAYOR_IGUAL expresion { printf("Condicion mayor o igual OK\n"); }
 		   | expresion IGUAL expresion { printf("Condicion igual OK\n"); }
 		   | expresion DISTINTO expresion { printf("Condicion distinto OK\n"); }
-		   | inlist { printf("INLIST ok\n"); }
+		   | inlist { printf("INLIST OK\n"); }
 		   ; 
 
+average: AVG P_A C_A avg_expresiones C_C P_C
+
+avg_expresiones: expresion
+			   | expresion COMA avg_expresiones
+			   ;
+
 inlist: INLIST P_A ID COMA C_A inlist_expresiones C_C P_C
-		 ;
+	  ;
 
 inlist_expresiones: expresion
-		 | inlist_expresiones PUNTO_COMA expresion
-		 ;
+		          | inlist_expresiones PUNTO_COMA expresion
+		          ;
 		  
 expresion: expresion OP_SUMA termino { printf("Suma OK\n"); }
 		 | expresion OP_RESTA termino { printf("Resta OK\n"); }
@@ -89,7 +96,7 @@ termino: termino OP_MULT factor { printf("Multiplicacion OK\n"); }
 	   | factor
 	   ;
 	   
-factor: ID
+factor: ID	{ printf("ID es: %s\n",yylval.strVal); }  
 	  | constante
 	  | P_A expresion P_C
 	  ;

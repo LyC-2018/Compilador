@@ -21,6 +21,7 @@ CTE_REAL        {DIGITO}+"."{DIGITO}*
 CTE_INT         {DIGITO}+
 ID				{LETRA}({LETRA}|{DIGITO}|_)*
 INLIST          [Ii][Nn][Ll][Ii][Ss][Tt]
+AVG				[Aa][Vv][Gg]
 WHILE           [Ww][Hh][Ii][Ll][Ee]
 ENDWHILE        [Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]
 IF				[Ii][Ff]
@@ -44,6 +45,7 @@ OR				[Oo][Rr]
 ";"             { return PUNTO_COMA; }
 ","             { return COMA; }
 {INLIST}        { return INLIST; }
+{AVG}			{ return AVG; }
 {WHILE}         { return WHILE; } 
 {ENDWHILE}      { return ENDWHILE; }
 {IF}			{ return IF; }
