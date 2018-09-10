@@ -46,10 +46,10 @@ condicion: comparacion
 		 | condicion OR comparacion
 		 ;
 
-comparacion: factor MENOR factor { printf("Condicion menor OK\n"); }
-		   | factor MAYOR factor { printf("Condicion mayor OK\n"); }
-		   | factor IGUAL factor { printf("Condicion igual OK\n"); }
-		   | factor DISTINTO factor { printf("Condicion distinto OK\n"); }
+comparacion: expresion MENOR expresion { printf("Condicion menor OK\n"); }
+		   | expresion MAYOR expresion { printf("Condicion mayor OK\n"); }
+		   | expresion IGUAL expresion { printf("Condicion igual OK\n"); }
+		   | expresion DISTINTO expresion { printf("Condicion distinto OK\n"); }
 		   ; 
 		  
 expresion: expresion OP_SUMA termino { printf("Suma OK\n"); }
@@ -63,9 +63,9 @@ termino: termino OP_MULT factor { printf("Multiplicacion OK\n"); }
 	   ;
 	   
 factor: ID
-	   | CTE {$1 = yylval ;printf("ENTERO es: %d\n", yylval);}
-	   | P_A expresion P_C
-	   ;
+	  | CTE {$1 = yylval ;printf("ENTERO es: %d\n", yylval);}
+	  | P_A expresion P_C
+	  ;
 
 %%
 
