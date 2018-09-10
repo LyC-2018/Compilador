@@ -4,12 +4,17 @@
 #include <conio.h>
 #include "y.tab.h"
 
-int yylval;
 FILE *yyin;
 char *yytext;
 %}
 
-%token ID CTE CADENA
+%union {
+int intVal;
+double realVal;
+char *strVal;
+}
+
+%token <strVal>ID <intVal>CTE_INT <strVal>CTE_STRING <realVal>CTE_REAL
 %token ASIG OP_SUMA OP_RESTA OP_MULT OP_DIV
 %token MENOR MAYOR IGUAL DISTINTO MENOR_IGUAL MAYOR_IGUAL
 %token WHILE ENDWHILE
@@ -65,14 +70,20 @@ termino: termino OP_MULT factor { printf("Multiplicacion OK\n"); }
 	   ;
 	   
 factor: ID
-	  | CTE {$1 = yylval ;printf("ENTERO es: %d\n", yylval);}
+	  | constante
 	  | P_A expresion P_C
 	  ;
+	  
+constante: CTE_INT { yylval.intVal = atoi(yylval.strVal); printf("ENTERO es: %d\n",yylval.intVal); }  
+         | CTE_STRING { printf("STRING es: %s\n",yylval.strVal); }  
+		 | CTE_REAL { yylval.realVal = atof(yylval.strVal); printf("REAL es: %.2f\n",yylval.realVal); }
+		 ;
 
 %%
 
 int main(int argc,char *argv[])
 {
+  
   if ((yyin = fopen(argv[1], "rt")) == NULL)
   {
 	printf("\nNo se puede abrir el archivo: %s\n", argv[1]);

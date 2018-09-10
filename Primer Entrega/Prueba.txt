@@ -1,6 +1,6 @@
 a = (5 * 8) - z
 
-WHILE (5 < a AND 1 == 1)
+WHILE (5.5 < a AND 1 == 1)
     b = (5 / a - 2) + 1 
 ENDWHILE
 
@@ -8,7 +8,7 @@ IF (5 == 5 OR ((2 * 1) - 1) == 1 )
     a = 1
 ENDIF
 
-IF (X != 10)
+IF (X != "Hola")
     Z = X
 ELSE
     X = Z

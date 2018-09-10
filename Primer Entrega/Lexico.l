@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <string.h>
 #include "y.tab.h"
 
 FILE *yyin;
-int yylval;
+
 %}
 
 %option noyywrap
@@ -13,9 +14,12 @@ int yylval;
 
 DIGITO			[0-9]
 LETRA			[a-zA-Z]
-CTE				{DIGITO}*(.{DIGITO}+)?
+ESPACIO         [ ]
+CARACTER        [a-z|A-Z|0-9|=|>|<|!|:|+|-|*|/|?|¿|!|¡|@|%|#|&|°|´|^|`|~|/|\|-|_|.|,|;||]
+CTE_STRING      \"({CARACTER}+|{ESPACIO})*\"
+CTE_REAL        {DIGITO}+"."{DIGITO}*
+CTE_INT         {DIGITO}+
 ID				{LETRA}({LETRA}|{DIGITO}|_)*
-CADENA			\"({LETRA}|{DIGITO}|!|¡|>|:|<|[ ]|+|@|%|#|&|°|´|^|`|?|¿|~|/|\|-|_|.|;)*\"
 WHILE           [Ww][Hh][Ii][Ll][Ee]
 ENDWHILE        [Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]
 IF				[Ii][Ff]
@@ -49,8 +53,10 @@ OR				[Oo][Rr]
 "=="            { return IGUAL; }
 "!="            { return DISTINTO; }
 
-{DIGITO}+		{ yylval = atoi(yytext); return CTE; }
-{ID}			{ printf("ID es: %s\n",yytext);return ID;}
+{ID}			{ yylval.strVal = strdup(yytext); return ID; }
+{CTE_STRING}	{ yylval.strVal = strdup(yytext); return CTE_STRING; }
+{CTE_INT}		{ yylval.strVal = strdup(yytext); return CTE_INT; }
+{CTE_REAL}		{ yylval.strVal = strdup(yytext); return CTE_REAL; }
 
 "\n"
 "\t"
