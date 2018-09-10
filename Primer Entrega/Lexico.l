@@ -21,6 +21,8 @@ ENDWHILE        [Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]
 IF				[Ii][Ff]
 ELSE			[Ee][Ll][Ss][Ee]
 ENDIF			[Ee][Nn][Dd][Ii][Ff]
+AND				[Aa][Nn][Dd]
+OR				[Oo][Rr]
 
 
 %%
@@ -37,6 +39,8 @@ ENDIF			[Ee][Nn][Dd][Ii][Ff]
 {IF}			{ return IF; }
 {ELSE}			{ return ELSE; }
 {ENDIF}			{ return ENDIF; }
+{AND}			{ return AND; }
+{OR}			{ return OR; }
 
 ">"             { return MAYOR; }
 "<"             { return MENOR; }

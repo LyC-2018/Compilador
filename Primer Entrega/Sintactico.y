@@ -15,6 +15,7 @@ char *yytext;
 %token WHILE ENDWHILE
 %token IF ELSE ENDIF
 %token P_A P_C
+%token AND OR
 
 %%
 
@@ -37,13 +38,19 @@ iteracion: WHILE P_A condicion P_C programa ENDWHILE
 		 ;
 		
 decision: IF P_A condicion P_C programa ENDIF
-		 | IF P_A condicion P_C programa ELSE programa ENDIF
+		| IF P_A condicion P_C programa ELSE programa ENDIF
+		;
 
-condicion: factor MENOR factor { printf("Condicion menor OK\n"); }
-		| factor MAYOR factor { printf("Condicion mayor OK\n"); }
-		| factor IGUAL factor { printf("Condicion igual OK\n"); }
-		| factor DISTINTO factor { printf("Condicion distinto OK\n"); }
-		; 
+condicion: comparacion
+         | condicion AND comparacion 
+		 | condicion OR comparacion
+		 ;
+
+comparacion: factor MENOR factor { printf("Condicion menor OK\n"); }
+		   | factor MAYOR factor { printf("Condicion mayor OK\n"); }
+		   | factor IGUAL factor { printf("Condicion igual OK\n"); }
+		   | factor DISTINTO factor { printf("Condicion distinto OK\n"); }
+		   ; 
 		  
 expresion: expresion OP_SUMA termino { printf("Suma OK\n"); }
 		 | expresion OP_RESTA termino { printf("Resta OK\n"); }
