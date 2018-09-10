@@ -27,9 +27,11 @@ char *strVal;
 %token <strVal>ID <intVal>CTE_INT <strVal>CTE_STRING <realVal>CTE_REAL
 %token ASIG OP_SUMA OP_RESTA OP_MULT OP_DIV
 %token MENOR MAYOR IGUAL DISTINTO MENOR_IGUAL MAYOR_IGUAL
+%token INLIST
 %token WHILE ENDWHILE
 %token IF ELSE ENDIF
-%token P_A P_C
+%token P_A P_C C_A C_C
+%token COMA PUNTO_COMA
 %token AND OR
 %token INT FLOAT STRING COMA DOS_PUNTOS DECVAR ENDEC
 %%
@@ -85,7 +87,15 @@ comparacion: expresion MENOR expresion { printf("Condicion menor OK\n"); }
 		   | expresion MAYOR_IGUAL expresion { printf("Condicion mayor o igual OK\n"); }
 		   | expresion IGUAL expresion { printf("Condicion igual OK\n"); }
 		   | expresion DISTINTO expresion { printf("Condicion distinto OK\n"); }
+		   | inlist { printf("INLIST ok\n"); }
 		   ; 
+
+inlist: INLIST P_A ID COMA C_A inlist_expresiones C_C P_C
+		 ;
+
+inlist_expresiones: expresion
+		 | inlist_expresiones PUNTO_COMA expresion
+		 ;
 		  
 expresion: expresion OP_SUMA termino { printf("Suma OK\n"); }
 		 | expresion OP_RESTA termino { printf("Resta OK\n"); }

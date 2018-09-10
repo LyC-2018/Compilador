@@ -8,6 +8,13 @@ IF (5 == 5 OR ((2 * 1) - 1) == 1 )
     a = 1
 ENDIF
 
+WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34+d) ; 48]) AND b == 1)
+    a = 1
+    IF (X == 10)
+        a = a + 1
+    ENDIF
+ENDWHILE
+
 IF (X != "Hola")
     Z = X
 ELSE
