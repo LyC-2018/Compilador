@@ -48,6 +48,7 @@ ENDEC			[Ee][Nn][Dd][Ee][Cc]
 "]"             { return C_C; }
 ";"             { return PUNTO_COMA; }
 ","             { return COMA; }
+":"				{ return DOS_PUNTOS; }
 {INLIST}        { return INLIST; }
 {WHILE}         { return WHILE; } 
 {ENDWHILE}      { return ENDWHILE; }
@@ -74,8 +75,7 @@ ENDEC			[Ee][Nn][Dd][Ee][Cc]
 {STRING}		{ return STRING; }
 {DECVAR}		{ return DECVAR; }
 {ENDEC}			{ return ENDEC; }
-":"				{ return DOS_PUNTOS; }
-","				{ return COMA; }
+
 "\n"
 "\t"
 

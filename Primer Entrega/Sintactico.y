@@ -33,7 +33,7 @@ char *strVal;
 %token P_A P_C C_A C_C
 %token COMA PUNTO_COMA
 %token AND OR
-%token INT FLOAT STRING COMA DOS_PUNTOS DECVAR ENDEC
+%token INT FLOAT STRING DOS_PUNTOS DECVAR ENDEC
 %%
 
 start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
