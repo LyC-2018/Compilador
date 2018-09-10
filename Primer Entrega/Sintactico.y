@@ -13,6 +13,7 @@ char *yytext;
 %token ASIG OP_SUMA OP_RESTA OP_MULT OP_DIV
 %token MENOR MAYOR IGUAL DISTINTO
 %token WHILE ENDWHILE
+%token IF ELSE ENDIF
 %token P_A P_C
 
 %%
@@ -25,14 +26,18 @@ programa: sentencia
 		;
 		
 sentencia: asignacion { printf("Asignacion OK\n"); }
-		| iteracion { printf("Iteracion OK\n"); }
+		 | iteracion { printf("Iteracion OK\n"); }
+		 | decision { printf("Seleccion OK\n"); }
 		 ;
 		 
 asignacion: ID ASIG expresion
 		  ;
 
 iteracion: WHILE P_A condicion P_C programa ENDWHILE
-		;
+		 ;
+		
+decision: IF P_A condicion P_C programa ENDIF
+		 | IF P_A condicion P_C programa ELSE programa ENDIF
 
 condicion: factor MENOR factor { printf("Condicion menor OK\n"); }
 		| factor MAYOR factor { printf("Condicion mayor OK\n"); }

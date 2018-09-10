@@ -18,6 +18,10 @@ ID				{LETRA}({LETRA}|{DIGITO}|_)*
 CADENA			\"({LETRA}|{DIGITO}|!|¡|>|:|<|[ ]|+|@|%|#|&|°|´|^|`|?|¿|~|/|\|-|_|.|;)*\"
 WHILE           [Ww][Hh][Ii][Ll][Ee]
 ENDWHILE        [Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]
+IF				[Ii][Ff]
+ELSE			[Ee][Ll][Ss][Ee]
+ENDIF			[Ee][Nn][Dd][Ii][Ff]
+
 
 %%
 
@@ -30,6 +34,9 @@ ENDWHILE        [Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]
 ")"				{ return P_C; }
 {WHILE}         { return WHILE; } 
 {ENDWHILE}      { return ENDWHILE; }
+{IF}			{ return IF; }
+{ELSE}			{ return ELSE; }
+{ENDIF}			{ return ENDIF; }
 
 ">"             { return MAYOR; }
 "<"             { return MENOR; }

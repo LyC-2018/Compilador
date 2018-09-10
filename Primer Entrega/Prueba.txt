@@ -3,3 +3,13 @@ a = (5 * 8) - z
 WHILE (5 < a)
     b = (5 / a - 2) + 1 
 ENDWHILE
+
+IF (5 == 5)
+    a = 1
+ENDIF
+
+IF (X != 10)
+    Z = X
+ELSE
+    X = Z
+ENDIF
