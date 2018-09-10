@@ -20,6 +20,7 @@ CTE_STRING      \"({CARACTER}+|{ESPACIO})*\"
 CTE_REAL        {DIGITO}+"."{DIGITO}*
 CTE_INT         {DIGITO}+
 ID				{LETRA}({LETRA}|{DIGITO}|_)*
+INLIST          [Ii][Nn][Ll][Ii][Ss][Tt]
 WHILE           [Ww][Hh][Ii][Ll][Ee]
 ENDWHILE        [Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]
 IF				[Ii][Ff]
@@ -38,6 +39,11 @@ OR				[Oo][Rr]
 "="			    { return ASIG; }
 "("				{ return P_A; }
 ")"				{ return P_C; }
+"["             { return C_A; }
+"]"             { return C_C; }
+";"             { return PUNTO_COMA; }
+","             { return COMA; }
+{INLIST}        { return INLIST; }
 {WHILE}         { return WHILE; } 
 {ENDWHILE}      { return ENDWHILE; }
 {IF}			{ return IF; }
