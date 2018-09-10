@@ -27,8 +27,13 @@ ELSE			[Ee][Ll][Ss][Ee]
 ENDIF			[Ee][Nn][Dd][Ii][Ff]
 AND				[Aa][Nn][Dd]
 OR				[Oo][Rr]
-
-
+DOS_PUNTOS		:
+COMA			,
+INT				[Ii][Nn][Tt]
+FLOAT			[Ff][Ll][Oo][Aa][Tt]
+STRING			[Ss][Tt][Rr][Ii][Nn][Gg]
+DECVAR			[Dd][Ee][Cc][Vv][Aa][Rr]
+ENDEC			[Ee][Nn][Dd][Ee][Cc]
 %%
 
 "+"				{ return OP_SUMA; }
@@ -58,6 +63,13 @@ OR				[Oo][Rr]
 {CTE_INT}		{ yylval.strVal = strdup(yytext); return CTE_INT; }
 {CTE_REAL}		{ yylval.strVal = strdup(yytext); return CTE_REAL; }
 
+{INT}			{ return INT; }
+{FLOAT}			{ return FLOAT; }
+{STRING}		{ return STRING; }
+{DECVAR}		{ return DECVAR; }
+{ENDEC}			{ return ENDEC; }
+":"				{ return DOS_PUNTOS; }
+","				{ return COMA; }
 "\n"
 "\t"
 

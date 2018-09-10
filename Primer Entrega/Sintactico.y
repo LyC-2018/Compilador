@@ -31,7 +31,7 @@ char *strVal;
 %token IF ELSE ENDIF
 %token P_A P_C
 %token AND OR
-
+%token INT FLOAT STRING COMA DOS_PUNTOS DECVAR ENDEC
 %%
 
 start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
@@ -44,6 +44,7 @@ programa: sentencia
 sentencia: asignacion { printf("Asignacion OK\n"); }
 		 | iteracion { printf("Iteracion OK\n"); }
 		 | decision { printf("Seleccion OK\n"); }
+		 | declaracionVar { printf("Declaracion OK\n"); }
 		 ;
 		 
 asignacion: ID ASIG expresion
@@ -55,6 +56,23 @@ iteracion: WHILE P_A condicion P_C programa ENDWHILE
 decision: IF P_A condicion P_C programa ENDIF
 		| IF P_A condicion P_C programa ELSE programa ENDIF
 		;
+
+declaracionVar: DECVAR listaVar ENDEC
+			  | DECVAR ENDEC
+			  ;
+
+listaVar: variables
+		| variables listaVar DOS_PUNTOS tipo
+		;
+	
+tipo: INT
+    | FLOAT
+	| STRING
+	;
+
+variables: ID COMA variables
+		 | ID
+		 ;
 
 condicion: comparacion
          | condicion AND comparacion 

@@ -1,3 +1,10 @@
+DECVAR
+    a1,b1 : FLOAT
+    variable1 : STRING
+    p1,p2,p3 : FLOAT
+    e1,e2,e3 : INT
+ENDEC
+
 a = (5 * 8) - z
 
 WHILE (5.5 < a AND 1 == 1)
