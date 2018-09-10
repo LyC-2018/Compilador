@@ -43,7 +43,9 @@ OR				[Oo][Rr]
 {OR}			{ return OR; }
 
 ">"             { return MAYOR; }
+">="            { return MAYOR_IGUAL; }
 "<"             { return MENOR; }
+"<="            { return MENOR_IGUAL; }
 "=="            { return IGUAL; }
 "!="            { return DISTINTO; }
 

@@ -11,7 +11,7 @@ char *yytext;
 
 %token ID CTE CADENA
 %token ASIG OP_SUMA OP_RESTA OP_MULT OP_DIV
-%token MENOR MAYOR IGUAL DISTINTO
+%token MENOR MAYOR IGUAL DISTINTO MENOR_IGUAL MAYOR_IGUAL
 %token WHILE ENDWHILE
 %token IF ELSE ENDIF
 %token P_A P_C
@@ -47,7 +47,9 @@ condicion: comparacion
 		 ;
 
 comparacion: expresion MENOR expresion { printf("Condicion menor OK\n"); }
+		   | expresion MENOR_IGUAL expresion { printf("Condicion menor o igual OK\n"); }
 		   | expresion MAYOR expresion { printf("Condicion mayor OK\n"); }
+		   | expresion MAYOR_IGUAL expresion { printf("Condicion mayor o igual OK\n"); }
 		   | expresion IGUAL expresion { printf("Condicion igual OK\n"); }
 		   | expresion DISTINTO expresion { printf("Condicion distinto OK\n"); }
 		   ; 
