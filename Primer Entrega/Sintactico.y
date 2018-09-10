@@ -2,10 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <string.h>
+#include <float.h>
+#include <limits.h>
 #include "y.tab.h"
 
 FILE *yyin;
 char *yytext;
+
+/* FUNCIONES */
+int validarInt(int entero);
+int validarString(char *str);
+int validarReal(float flotante);
+int validarID(char *str);
+
 %}
 
 %union {
@@ -74,9 +84,9 @@ factor: ID
 	  | P_A expresion P_C
 	  ;
 	  
-constante: CTE_INT { yylval.intVal = atoi(yylval.strVal); printf("ENTERO es: %d\n",yylval.intVal); }  
-         | CTE_STRING { printf("STRING es: %s\n",yylval.strVal); }  
-		 | CTE_REAL { yylval.realVal = atof(yylval.strVal); printf("REAL es: %.2f\n",yylval.realVal); }
+constante: CTE_INT { yylval.intVal = atoi(yylval.strVal); validarInt(yylval.intVal); printf("ENTERO es: %d\n",yylval.intVal); }  
+         | CTE_STRING { printf("STRING es: %s\n",yylval.strVal); validarString(yylval.strVal); }  
+		 | CTE_REAL { yylval.realVal = atof(yylval.strVal); validarReal(yylval.realVal); printf("REAL es: %.2f\n",yylval.realVal); }
 		 ;
 
 %%
@@ -95,11 +105,58 @@ int main(int argc,char *argv[])
   fclose(yyin);
   return 0;
 }
+
 int yyerror(void)
 {
 	printf ("Syntax Error\n");
 	system ("Pause");
 	exit (1);
+}
+
+/* 
+	Funcion para validar el rango de enteros 
+*/
+int validarInt(int entero)
+{
+
+	if(entero < INT_MIN || entero > INT_MAX){
+		printf(" ERROR: Entero fuera de rango (32 bits maximo)\n");
+		yyerror();
+	}
+	return 1;
+}
+
+/*
+	Funcion para validar string 
+*/
+int validarString(char *str)
+{
+	char *aux = str;
+    int largo = strlen(aux);
+ 
+	if(largo > 30){
+		printf(" ERROR: Cadena demasiado larga (30 caracteres maximo)\n");
+		yyerror();
+	}else{
+		//printf(" Valide bien la cadena! : %s\n", str);
+	}
+	
+	return 1;
+}
+
+/*
+	Funcion para validar float 
+*/
+int validarReal(float Real)
+{
+
+	if(Real < FLT_MIN || Real > FLT_MAX){
+		printf(" ERROR: Real fuera de rango (-1.17549e-38; 3.40282e38) \n");
+		yyerror();
+	}else{
+		//printf("Valide bien float ! \n");
+	}
+	return 1;
 }
 
 
