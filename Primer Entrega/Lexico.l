@@ -3,9 +3,17 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <string.h>
+#include <float.h>
+#include <limits.h>
 #include "y.tab.h"
 
 FILE *yyin;
+
+/* FUNCIONES */
+int validarInt(int entero);
+int validarString(char *str);
+int validarReal(float flotante);
+int validarID(char *str);
 
 %}
 
@@ -33,9 +41,9 @@ INT				[Ii][Nn][Tt]
 FLOAT			[Ff][Ll][Oo][Aa][Tt]
 STRING			[Ss][Tt][Rr][Ii][Nn][Gg]
 DECVAR			[Dd][Ee][Cc][Vv][Aa][Rr]
-ENDEC			[Ee][Nn][Dd][Ee][Cc]
-%%
+ENDDEC			[Ee][Nn][Dd][Dd][Ee][Cc]
 
+%%
 "+"				{ return OP_SUMA; }
 "-"				{ return OP_RESTA; }
 "*"				{ return OP_MULT; }
@@ -65,17 +73,80 @@ ENDEC			[Ee][Nn][Dd][Ee][Cc]
 "=="            { return IGUAL; }
 "!="            { return DISTINTO; }
 
-{ID}			{ yylval.strVal = strdup(yytext); return ID; }
-{CTE_STRING}	{ yylval.strVal = strdup(yytext); return CTE_STRING; }
-{CTE_INT}		{ yylval.strVal = strdup(yytext); return CTE_INT; }
-{CTE_REAL}		{ yylval.strVal = strdup(yytext); return CTE_REAL; }
+{ID}			{ yylval.strVal = strdup(yytext); validarID(yylval.strVal); return ID; }
+{CTE_STRING}	{ yylval.strVal = strdup(yytext); validarString(yylval.strVal); return CTE_STRING; }
+{CTE_INT}		{ yylval.intVal = atoi(yytext); validarInt(yylval.intVal); return CTE_INT; }
+{CTE_REAL}		{ yylval.realVal = atof(yytext); validarReal(yylval.realVal); return CTE_REAL; }
 
 {INT}			{ return INT; }
 {FLOAT}			{ return FLOAT; }
 {STRING}		{ return STRING; }
 {DECVAR}		{ return DECVAR; }
-{ENDEC}			{ return ENDEC; }
+{ENDDEC}		{ return ENDDEC; }
 
 "\n"
 "\t"
+%%
+
+/* 
+	Funcion para validar el rango de enteros 
+*/
+int validarInt(int entero)
+{
+
+	if(entero < INT_MIN || entero > INT_MAX){
+		printf(" ERROR: Entero fuera de rango (32 bits maximo)\n");
+		yyerror();
+	}
+	return 1;
+}
+
+/*
+	Funcion para validar string 
+*/
+int validarString(char *str)
+{
+    int largo = strlen(str);
+ 
+	if(largo > 30){
+		printf(" ERROR: Cadena demasiada larga (30 caracteres maximo)\n");
+		yyerror();
+	}else{
+		//printf(" Valide bien la cadena! : %s\n", str);
+	}
+	
+	return 1;
+}
+
+/*
+	Funcion para validar float 
+*/
+int validarReal(float Real)
+{
+
+	if(Real < FLT_MIN || Real > FLT_MAX){
+		printf(" ERROR: Real fuera de rango (-1.17549e-38; 3.40282e38) \n");
+		yyerror();
+	}else{
+		//printf("Valide bien float ! \n");
+	}
+	return 1;
+}
+
+/*
+	Funcion para validar identificador
+*/
+int validarID(char *str)
+{
+    int largo = strlen(str);
+ 
+	if(largo > 10){
+		printf(" ERROR: Identificador demasiado largo (10 caracteres maximo)\n");
+		yyerror();
+	}else{
+		//printf(" Valide bien el identificador! : %s\n", str);
+	}
+	
+	return 1;
+}
 

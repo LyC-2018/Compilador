@@ -1,14 +1,11 @@
 a = (5 * 8) - z
 
-AVG([2,a+b,c*(d+e),48])
-AVG([2.3])
-
-WHILE (5.5 < a AND 1 == 1)
+WHILE (AVG([2.3]) == 2.3 OR 1==1 OR 2==2)
     b = (5 / a - 2) + 1 
 ENDWHILE
 
-IF (5 == 5 OR ((2 * 1) - 1) == 1 )
-    a = 1
+IF (((2 * 1) - 1) == 1 )
+    a = AVG([2,a+b,c*(d+e),48])
 ENDIF
 
 WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34+d) ; 48]) AND b == 1)
