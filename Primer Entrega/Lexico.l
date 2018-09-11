@@ -69,6 +69,16 @@ WRITE			[Ww][Rr][Ii][Tt][Ee]
 {AND}			{ return AND; }
 {OR}			{ return OR; }
 
+{DECVAR}		{ return DECVAR; }
+{ENDDEC}		{ return ENDDEC; }
+
+{READ}          { return READ; }
+{WRITE}         { return WRITE; }
+
+{INT}			{ return INT; }
+{FLOAT}			{ return FLOAT; }
+{STRING}		{ return STRING; }
+
 ">"             { return MAYOR; }
 ">="            { return MAYOR_IGUAL; }
 "<"             { return MENOR; }
@@ -80,15 +90,6 @@ WRITE			[Ww][Rr][Ii][Tt][Ee]
 {CTE_STRING}	{ yylval.strVal = strdup(yytext); validarString(yylval.strVal); return CTE_STRING; }
 {CTE_INT}		{ yylval.intVal = atoi(yytext); validarInt(yylval.intVal); return CTE_INT; }
 {CTE_REAL}		{ yylval.realVal = atof(yytext); validarReal(yylval.realVal); return CTE_REAL; }
-
-{INT}			{ return INT; }
-{FLOAT}			{ return FLOAT; }
-{STRING}		{ return STRING; }
-{DECVAR}		{ return DECVAR; }
-{ENDDEC}		{ return ENDDEC; }
-
-{READ}          { return READ; }
-{WRITE}         { return WRITE; }
 
 " "
 "\t"
