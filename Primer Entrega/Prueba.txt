@@ -15,7 +15,7 @@ WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34+d) ; 48]) AND b == 1)
     ENDIF
 ENDWHILE
 
-IF (X != "Hola")
+IF (X != "Holaa    Mundo")
     Z = X
 ELSE
     X = Z

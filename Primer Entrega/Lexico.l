@@ -14,6 +14,7 @@ int validarInt(int entero);
 int validarString(char *str);
 int validarReal(float flotante);
 int validarID(char *str);
+void mensaje_error();
 
 %}
 
@@ -22,9 +23,9 @@ int validarID(char *str);
 
 DIGITO			[0-9]
 LETRA			[a-zA-Z]
-ESPACIO         [ ]
+DELIM           [ \t\n]
 CARACTER        [a-z|A-Z|0-9|=|>|<|!|:|+|-|*|/|?|¿|!|¡|@|%|#|&|°|´|^|`|~|/|\|-|_|.|,|;||]
-CTE_STRING      \"({CARACTER}+|{ESPACIO})*\"
+CTE_STRING      \"({CARACTER}+|{DELIM})*\"
 CTE_REAL        {DIGITO}+"."{DIGITO}*
 CTE_INT         {DIGITO}+
 ID				{LETRA}({LETRA}|{DIGITO}|_)*
@@ -84,8 +85,9 @@ ENDDEC			[Ee][Nn][Dd][Dd][Ee][Cc]
 {DECVAR}		{ return DECVAR; }
 {ENDDEC}		{ return ENDDEC; }
 
-"\n"
+" "
 "\t"
+"\n"		    
 %%
 
 /* 
@@ -95,8 +97,10 @@ int validarInt(int entero)
 {
 
 	if(entero < INT_MIN || entero > INT_MAX){
-		printf(" ERROR: Entero fuera de rango (32 bits maximo)\n");
-		yyerror();
+		printf("(!) ERROR: Constante entera fuera de rango (32 bits maximo) -> Linea %d\n", yylineno);
+		fprintf(stderr, "Fin de ejecucion.\n");
+		system ("Pause");
+		exit (1);
 	}
 	return 1;
 }
@@ -106,11 +110,11 @@ int validarInt(int entero)
 */
 int validarString(char *str)
 {
-    int largo = strlen(str);
- 
-	if(largo > 30){
-		printf(" ERROR: Cadena demasiada larga (30 caracteres maximo)\n");
-		yyerror();
+	if(strlen(str) > 30){
+		printf("(!) ERROR: Constante string fuera de rango (30 caracteres maximo) -> Linea %d\n", yylineno);
+		fprintf(stderr, "Fin de ejecucion.\n");
+		system ("Pause");
+		exit (1);
 	}else{
 		//printf(" Valide bien la cadena! : %s\n", str);
 	}
@@ -121,12 +125,14 @@ int validarString(char *str)
 /*
 	Funcion para validar float 
 */
-int validarReal(float Real)
+int validarReal(float real)
 {
 
-	if(Real < FLT_MIN || Real > FLT_MAX){
-		printf(" ERROR: Real fuera de rango (-1.17549e-38; 3.40282e38) \n");
-		yyerror();
+	if(real < FLT_MIN || real > FLT_MAX){
+		printf("(!) ERROR: Constante real fuera de rango (-1.17549e-38; 3.40282e38) -> Linea %d\n", yylineno);
+		fprintf(stderr, "Fin de ejecucion.\n");
+		system ("Pause");
+		exit (1);
 	}else{
 		//printf("Valide bien float ! \n");
 	}
@@ -141,8 +147,10 @@ int validarID(char *str)
     int largo = strlen(str);
  
 	if(largo > 10){
-		printf(" ERROR: Identificador demasiado largo (10 caracteres maximo)\n");
-		yyerror();
+		printf("(!) ERROR: Identificador fuera de rango (10 caracteres maximo) -> Linea %d\n", yylineno);
+		fprintf(stderr, "Fin de ejecucion.\n");
+		system ("Pause");
+		exit (1);
 	}else{
 		//printf(" Valide bien el identificador! : %s\n", str);
 	}

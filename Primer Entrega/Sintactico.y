@@ -7,6 +7,7 @@
 
 FILE *yyin;
 char *yytext;
+extern int yylineno;
 
 %}
 
@@ -23,23 +24,26 @@ char *strVal;
 %token WHILE ENDWHILE
 %token IF ELSE ENDIF
 %token P_A P_C C_A C_C
-%token COMA PUNTO_COMA
+%token COMA PUNTO_COMA DOS_PUNTOS
 %token AND OR
-%token INT FLOAT STRING DOS_PUNTOS DECVAR ENDDEC
+%token INT FLOAT STRING 
+%token DECVAR ENDDEC
 %%
 
 start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
-		;
+	 ;
 
-programa: sentencia 
-		| programa sentencia
+programa: declaracion { printf("Declaracion OK\n"); } bloque
+        | bloque
 		;
+		
+bloque: sentencia
+	  | bloque sentencia
+	  ;
 		
 sentencia: asignacion { printf("Asignacion OK\n"); }
 		 | iteracion { printf("Iteracion OK\n"); }
 		 | decision { printf("Seleccion OK\n"); }
-		 | declaracionVar { printf("Declaracion OK\n"); }
-
 		 ;
 		 
 asignacion: ID ASIG expresion
@@ -52,22 +56,22 @@ decision: IF P_A condicion P_C programa ENDIF
 		| IF P_A condicion P_C programa ELSE programa ENDIF
 		;
 
-declaracionVar: DECVAR listaVar ENDDEC
-			  | DECVAR ENDDEC
-			  ;
-
+declaracion: DECVAR listaVar ENDDEC
+		   | DECVAR ENDDEC
+		   ;
+		   
 listaVar: variables
-		| variables listaVar DOS_PUNTOS tipo
+        | listaVar variables
 		;
+
+variables: ID DOS_PUNTOS tipo
+		 | ID COMA variables
+		 ;
 	
 tipo: INT
     | FLOAT
 	| STRING
 	;
-
-variables: ID COMA variables
-		 | ID
-		 ;
 
 condicion: comparacion
          | condicion AND comparacion 
@@ -134,11 +138,12 @@ int main(int argc,char *argv[])
   return 0;
 }
 
-int yyerror(void)
+int yyerror(char *errMessage)
 {
-	printf ("Syntax Error\n");
-	system ("Pause");
-	exit (1);
+   printf("(!) ERROR en la linea %d: %s\n",yylineno,errMessage);
+   fprintf(stderr, "Fin de ejecucion.\n");
+   system ("Pause");
+   exit (1);
 }
 
 
