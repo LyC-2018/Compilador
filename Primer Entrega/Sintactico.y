@@ -25,7 +25,7 @@ char *strVal;
 %token IF ELSE ENDIF
 %token P_A P_C C_A C_C
 %token COMA PUNTO_COMA DOS_PUNTOS
-%token AND OR
+%token AND OR NOT
 %token INT FLOAT STRING 
 %token DECVAR ENDDEC
 %token READ WRITE
@@ -35,6 +35,7 @@ char *strVal;
 %%
 
 start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
+	 |			{ printf("\n El archivo 'Prueba.Txt' se encuentra vacio\n"); }
 	 ;
 
 programa: declaracion { printf("Declaracion OK\n"); } bloque
@@ -63,10 +64,10 @@ bloque: sentencia
 	  ;
 		
 sentencia: asignacion { printf("Asignacion OK\n"); }
-		 | iteracion { printf("Iteracion OK\n"); }
-		 | decision { printf("Decision OK\n"); }
-		 | entrada { printf("Entrada OK\n"); }
-		 | salida { printf("Salida OK\n"); }
+		 | iteracion  { printf("Iteracion OK\n"); }
+		 | decision   { printf("Decision OK\n"); }
+		 | entrada    { printf("Entrada OK\n"); }
+		 | salida     { printf("Salida OK\n"); }
 		 ;
 		 
 asignacion: ID ASIG expresion
@@ -80,17 +81,19 @@ decision: IF P_A condicion P_C programa ENDIF
 		;
 
 condicion: comparacion
-         | condicion AND comparacion 
-		 | condicion OR comparacion
+         | comparacion AND comparacion 
+		 | comparacion OR comparacion
+		 | NOT comparacion
+		 | NOT P_A comparacion P_C
 		 ;
 
-comparacion: expresion MENOR expresion { printf("Condicion menor OK\n"); }
+comparacion: expresion MENOR expresion       { printf("Condicion menor OK\n"); }
 		   | expresion MENOR_IGUAL expresion { printf("Condicion menor o igual OK\n"); }
-		   | expresion MAYOR expresion { printf("Condicion mayor OK\n"); }
+		   | expresion MAYOR expresion       { printf("Condicion mayor OK\n"); }
 		   | expresion MAYOR_IGUAL expresion { printf("Condicion mayor o igual OK\n"); }
-		   | expresion IGUAL expresion { printf("Condicion igual OK\n"); }
-		   | expresion DISTINTO expresion { printf("Condicion distinto OK\n"); }
-		   | inlist { printf("INLIST OK\n"); }
+		   | expresion IGUAL expresion       { printf("Condicion igual OK\n"); }
+		   | expresion DISTINTO expresion    { printf("Condicion distinto OK\n"); }
+		   | inlist                          { printf("INLIST OK\n"); }
 		   ; 
 
 average: AVG P_A C_A avg_expresiones C_C P_C
@@ -106,7 +109,7 @@ inlist_expresiones: expresion
 		          | inlist_expresiones PUNTO_COMA expresion
 		          ;
 		  
-expresion: expresion OP_SUMA termino { printf("Suma OK\n"); }
+expresion: expresion OP_SUMA termino  { printf("Suma OK\n"); }
 		 | expresion OP_RESTA termino { printf("Resta OK\n"); }
 		 | termino
 		 ;
@@ -116,15 +119,15 @@ termino: termino OP_MULT factor { printf("Multiplicacion OK\n"); }
 	   | factor
 	   ;
 	   
-factor: ID	{ printf("ID es: %s\n",yylval.strVal); }  
+factor: ID	              { printf("ID es: %s\n",yylval.strVal); }  
 	  | constante
 	  | P_A expresion P_C
-	  | average { printf("AVG OK\n"); }
+	  | average           { printf("AVG OK\n"); }
 	  ;
 	  
-constante: CTE_INT { printf("ENTERO es: %d\n",yylval.intVal); }  
+constante: CTE_INT    { printf("ENTERO es: %d\n",yylval.intVal); }  
          | CTE_STRING { printf("STRING es: %s\n",yylval.strVal); }  
-		 | CTE_REAL { printf("REAL es: %.2f\n",yylval.realVal); }
+		 | CTE_REAL   { printf("REAL es: %.2f\n",yylval.realVal); }
 		 ;
 
 entrada: READ ID

@@ -38,6 +38,7 @@ ELSE			[Ee][Ll][Ss][Ee]
 ENDIF			[Ee][Nn][Dd][Ii][Ff]
 AND				[Aa][Nn][Dd]
 OR				[Oo][Rr]
+NOT				[Nn][Oo][Tt]
 INT				[Ii][Nn][Tt]
 FLOAT			[Ff][Ll][Oo][Aa][Tt]
 STRING			[Ss][Tt][Rr][Ii][Nn][Gg]
@@ -68,6 +69,7 @@ WRITE			[Ww][Rr][Ii][Tt][Ee]
 {ENDIF}			{ return ENDIF; }
 {AND}			{ return AND; }
 {OR}			{ return OR; }
+{NOT}           { return NOT; }
 
 {DECVAR}		{ return DECVAR; }
 {ENDDEC}		{ return ENDDEC; }
