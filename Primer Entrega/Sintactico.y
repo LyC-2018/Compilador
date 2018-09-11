@@ -28,6 +28,10 @@ char *strVal;
 %token AND OR
 %token INT FLOAT STRING 
 %token DECVAR ENDDEC
+%token READ WRITE
+
+%start start
+
 %%
 
 start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
@@ -37,25 +41,6 @@ programa: declaracion { printf("Declaracion OK\n"); } bloque
         | bloque
 		;
 		
-bloque: sentencia
-	  | bloque sentencia
-	  ;
-		
-sentencia: asignacion { printf("Asignacion OK\n"); }
-		 | iteracion { printf("Iteracion OK\n"); }
-		 | decision { printf("Seleccion OK\n"); }
-		 ;
-		 
-asignacion: ID ASIG expresion
-		  ;
-
-iteracion: WHILE P_A condicion P_C programa ENDWHILE
-		 ;
-		
-decision: IF P_A condicion P_C programa ENDIF
-		| IF P_A condicion P_C programa ELSE programa ENDIF
-		;
-
 declaracion: DECVAR listaVar ENDDEC
 		   | DECVAR ENDDEC
 		   ;
@@ -72,6 +57,27 @@ tipo: INT
     | FLOAT
 	| STRING
 	;
+		
+bloque: sentencia
+	  | bloque sentencia
+	  ;
+		
+sentencia: asignacion { printf("Asignacion OK\n"); }
+		 | iteracion { printf("Iteracion OK\n"); }
+		 | decision { printf("Decision OK\n"); }
+		 | entrada { printf("Entrada OK\n"); }
+		 | salida { printf("Salida OK\n"); }
+		 ;
+		 
+asignacion: ID ASIG expresion
+		  ;
+
+iteracion: WHILE P_A condicion P_C programa ENDWHILE
+		 ;
+		
+decision: IF P_A condicion P_C programa ENDIF
+		| IF P_A condicion P_C programa ELSE programa ENDIF
+		;
 
 condicion: comparacion
          | condicion AND comparacion 
@@ -121,6 +127,13 @@ constante: CTE_INT { printf("ENTERO es: %d\n",yylval.intVal); }
 		 | CTE_REAL { printf("REAL es: %.2f\n",yylval.realVal); }
 		 ;
 
+entrada: READ ID
+       ;
+	   
+salida: WRITE CTE_STRING
+      | WRITE ID
+	  ;
+	  
 %%
 
 int main(int argc,char *argv[])

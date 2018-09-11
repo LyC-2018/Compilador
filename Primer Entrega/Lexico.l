@@ -43,6 +43,8 @@ FLOAT			[Ff][Ll][Oo][Aa][Tt]
 STRING			[Ss][Tt][Rr][Ii][Nn][Gg]
 DECVAR			[Dd][Ee][Cc][Vv][Aa][Rr]
 ENDDEC			[Ee][Nn][Dd][Dd][Ee][Cc]
+READ			[Rr][Ee][Aa][Dd]
+WRITE			[Ww][Rr][Ii][Tt][Ee]
 
 %%
 "+"				{ return OP_SUMA; }
@@ -84,6 +86,9 @@ ENDDEC			[Ee][Nn][Dd][Dd][Ee][Cc]
 {STRING}		{ return STRING; }
 {DECVAR}		{ return DECVAR; }
 {ENDDEC}		{ return ENDDEC; }
+
+{READ}          { return READ; }
+{WRITE}         { return WRITE; }
 
 " "
 "\t"
