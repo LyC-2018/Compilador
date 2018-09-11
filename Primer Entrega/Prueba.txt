@@ -1,3 +1,9 @@
+DECVAR
+ a,b,c : INT
+ d : FLOAT
+ e,f : STRING
+ENDDEC
+
 a = (5 * 8) - z
 WRITE a
 
