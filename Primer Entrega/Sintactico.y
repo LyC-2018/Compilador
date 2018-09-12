@@ -35,7 +35,7 @@ char *strVal;
 %%
 
 start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
-	 |			{ printf("\n El archivo 'Prueba.Txt' se encuentra vacio\n"); }
+	 |			{ printf("\n El archivo 'Prueba.Txt' no tiene un programa\n"); }
 	 ;
 
 programa: declaracion { printf("Declaracion OK\n"); } bloque
