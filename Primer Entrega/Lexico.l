@@ -25,7 +25,10 @@ DIGITO			[0-9]
 LETRA			[a-zA-Z]
 DELIM           [ \t\n]
 CARACTER        [a-z|A-Z|0-9|=|>|<|!|:|+|-|*|/|?|¿|!|¡|@|%|#|&|°|´|^|`|~|/|\|-|_|.|,|;||]
-CTE_STRING      \"({CARACTER}+|{DELIM})*\"
+VALID_STRING 	({CARACTER}+|{DELIM})*
+COMENTARIO_S	-\/{VALID_STRING}\/-
+COMENTARIO		({COMENTARIO_S}|-\/{VALID_STRING}{COMENTARIO_S}{VALID_STRING}\/-)+
+CTE_STRING      \"{VALID_STRING}\"
 CTE_REAL        {DIGITO}+"."{DIGITO}*
 CTE_INT         {DIGITO}+
 ID				{LETRA}({LETRA}|{DIGITO}|_)*
@@ -96,6 +99,7 @@ WRITE			[Ww][Rr][Ii][Tt][Ee]
 " "
 "\t"
 "\n"		    
+{COMENTARIO}   
 %%
 
 /* 
