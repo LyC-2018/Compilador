@@ -77,11 +77,11 @@ sentencia: asignacion { printf("Asignacion OK\n"); }
 asignacion: ID ASIG expresion
 		  ;
 
-iteracion: WHILE P_A condicion P_C programa ENDWHILE
+iteracion: WHILE P_A condicion P_C bloque ENDWHILE
 		 ;
 		
-decision: IF P_A condicion P_C programa ENDIF
-		| IF P_A condicion P_C programa ELSE programa ENDIF
+decision: IF P_A condicion P_C bloque ENDIF
+		| IF P_A condicion P_C bloque ELSE bloque ENDIF
 		;
 
 condicion: comparacion
