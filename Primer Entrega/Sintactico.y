@@ -149,6 +149,7 @@ int main(int argc,char *argv[])
   else
   {
 	yyparse();
+	save_reg_ts();
   }
   fclose(yyin);
   return 0;

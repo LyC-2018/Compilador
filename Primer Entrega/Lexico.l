@@ -9,12 +9,35 @@
 
 FILE *yyin;
 
+/* Tabla de simbolos */
+
+struct registro_ts {
+	char *nombre;
+	char *tipo;
+	char *valor;
+	char *longitud;
+};
+
+struct registro_ts tabla_simbolos[100];
+int cant_reg = 0;
+
 /* FUNCIONES */
 int validarInt(int entero);
+int insertar_cteint_en_ts(int entero);
+
 int validarString(char *str);
+int insertar_ctestring_en_ts(char *str);
+
 int validarReal(float flotante);
+int insertar_ctereal_en_ts(float flotante);
+
 int validarID(char *str);
+int insertar_id_en_ts(char *id);
+int id_existe_en_ts(char *id);
+
 void mensaje_error();
+void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longitud);
+void save_reg_ts();
 
 %}
 
@@ -92,16 +115,18 @@ WRITE			[Ww][Rr][Ii][Tt][Ee]
 "=="            { return IGUAL; }
 "!="            { return DISTINTO; }
 
-{ID}			{ yylval.strVal = strdup(yytext); validarID(yylval.strVal); return ID; }
-{CTE_STRING}	{ yylval.strVal = strdup(yytext); validarString(yylval.strVal); return CTE_STRING; }
-{CTE_INT}		{ yylval.intVal = atoi(yytext); validarInt(yylval.intVal); return CTE_INT; }
-{CTE_REAL}		{ yylval.realVal = atof(yytext); validarReal(yylval.realVal); return CTE_REAL; }
+{ID}			{ yylval.strVal = strdup(yytext); validarID(yylval.strVal); insertar_id_en_ts(yylval.strVal); return ID; }
+{CTE_STRING}	{ yylval.strVal = strdup(yytext); validarString(yylval.strVal); insertar_ctestring_en_ts(yylval.strVal); return CTE_STRING; }
+{CTE_INT}		{ yylval.intVal = atoi(yytext); validarInt(yylval.intVal); insertar_cteint_en_ts(yylval.intVal); return CTE_INT; }
+{CTE_REAL}		{ yylval.realVal = atof(yytext); validarReal(yylval.realVal); insertar_ctereal_en_ts(yylval.realVal); return CTE_REAL; }
 
 " "
 "\t"
 "\n"		    
 {COMENTARIO}   
+
 %%
+
 
 /* 
 	Funcion para validar el rango de enteros 
@@ -115,6 +140,20 @@ int validarInt(int entero)
 		system ("Pause");
 		exit (1);
 	}
+	return 1;
+}
+
+int insertar_cteint_en_ts(int entero)
+{
+	char *valor = (char*) malloc(sizeof(int));
+	itoa(entero, valor, 10);
+
+	char *nombre = (char*) malloc(sizeof(int)+1);
+	*nombre = '\0';
+	strcat(nombre, "_");
+	strcat(nombre, valor);
+	
+	insertar_tabla_simbolos(nombre, "CTE_INT", valor, "-");
 	return 1;
 }
 
@@ -135,6 +174,20 @@ int validarString(char *str)
 	return 1;
 }
 
+int insertar_ctestring_en_ts(char *str) 
+{
+	char *nombre = (char*) malloc(31*sizeof(char));
+	*nombre = '\0';
+	strcat(nombre, "_");
+	strcat(nombre, str);
+	
+	char *longitud = (char*) malloc(10*sizeof(char));	
+	itoa(strlen(str), longitud, 10);
+
+	insertar_tabla_simbolos(nombre, "CTE_STRING", str, longitud);
+	return 1;
+}
+
 /*
 	Funcion para validar float 
 */
@@ -149,6 +202,20 @@ int validarReal(float real)
 	}else{
 		//printf("Valide bien float ! \n");
 	}
+	return 1;
+}
+
+int insertar_ctereal_en_ts(float flotante)
+{
+	char *valor = (char*) malloc(sizeof(float));
+	snprintf(valor, sizeof(float), "%f", flotante);
+
+	char *nombre = (char*) malloc(sizeof(float)+1);
+	*nombre = '\0';
+	strcat(nombre, "_");
+	strcat(nombre, valor);
+	
+	insertar_tabla_simbolos(nombre, "CTE_REAL", valor, "-");
 	return 1;
 }
 
@@ -171,3 +238,55 @@ int validarID(char *str)
 	return 1;
 }
 
+int insertar_id_en_ts(char *id)
+{
+	if (id_existe_en_ts(id) == -1) 
+	{
+		insertar_tabla_simbolos(id, "","","-");
+	}
+
+	return 1;
+}
+
+int id_existe_en_ts(char *id) 
+{
+	int i;
+	for(i=0;i<cant_reg;i++){
+		if (strcmp(id, tabla_simbolos[i].nombre) == 0)
+			return 1;
+	}
+	return -1;
+}
+
+
+void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longitud)
+{
+	struct registro_ts reg;
+	reg.nombre = nombre;
+	reg.tipo = tipo;
+	reg.valor = valor;
+	reg.longitud = longitud;
+	
+	tabla_simbolos[cant_reg] = reg;
+	cant_reg++;
+}
+
+void save_reg_ts()
+{
+	FILE *file = fopen("ts.txt", "a");
+	
+	if(file == NULL) 
+	{
+    	printf("(!) ERROR: No se pudo abrir el txt correspondiente a la tabla de simbolos\n");
+	}
+	else 
+	{
+		int i = 0;
+		for (i; i < cant_reg; i++) 
+		{
+			//printf("%s\t%s\t%s\t%s\n", tabla_simbolos[i].nombre, tabla_simbolos[i].tipo, tabla_simbolos[i].valor, tabla_simbolos[i].longitud);
+			fprintf(file, "%s\t%s\t%s\t%s\n", tabla_simbolos[i].nombre, tabla_simbolos[i].tipo, tabla_simbolos[i].valor, tabla_simbolos[i].longitud);
+		}		
+		fclose(file);
+	}
+}

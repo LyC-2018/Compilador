@@ -1,3 +1,4 @@
+del ts.txt
 c:\GnuWin32\bin\flex Lexico.l
 pause
 c:\GnuWin32\bin\bison -dyv Sintactico.y
