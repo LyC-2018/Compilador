@@ -1,8 +1,4 @@
 a			-
-b			-
-c			-
-d			-
-e			-
 _5	CTE_INT	5	-
 _8	CTE_INT	8	-
 z			-
@@ -10,6 +6,7 @@ _2.3	CTE_REAL	2.3	-
 _2.3	CTE_REAL	2.3	-
 _1	CTE_INT	1	-
 _1	CTE_INT	1	-
+b			-
 _5	CTE_INT	5	-
 _2	CTE_INT	2	-
 _1	CTE_INT	1	-
@@ -18,6 +15,9 @@ _1	CTE_INT	1	-
 _1	CTE_INT	1	-
 _1	CTE_INT	1	-
 _2	CTE_INT	2	-
+c			-
+d			-
+e			-
 _48	CTE_INT	48	-
 _2	CTE_INT	2	-
 _7	CTE_INT	7	-

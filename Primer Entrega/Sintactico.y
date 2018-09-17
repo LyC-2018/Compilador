@@ -46,7 +46,7 @@ programa: declaracion { printf("Declaracion OK\n"); } bloque
         | bloque
 		;
 		
-declaracion: DECVAR variables ENDDEC { mostrar_ts(); }
+declaracion: DECVAR variables ENDDEC
 		   | DECVAR ENDDEC
 		   ;
 		   
@@ -152,9 +152,7 @@ int main(int argc,char *argv[])
   }
   else
   {
-	printf("Prueba.txt ABIERTO\n");
 	yyparse();
-	printf("Termino el PARSEO\n");
 	//mostrar_ts();
 	save_reg_ts();
 	printf("Listo TS\n");

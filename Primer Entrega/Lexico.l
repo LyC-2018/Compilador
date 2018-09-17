@@ -264,6 +264,7 @@ int id_existe_en_ts(char *id)
 void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longitud)
 {
 	struct registro_ts reg;
+	
 	reg.nombre = nombre;
 	reg.tipo = tipo;
 	reg.valor = valor;
@@ -309,21 +310,14 @@ void mostrar_ts()
 */
 
 void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual[]){
-  printf("Cantidad de variables del tipo %s: %d\n", tipoActual, variableActual);  
   int i;
-  
   for(i=0; i<variableActual; i++){
-	printf("\nVariables Actual: %s\n", listaVariables[i]);
-	printf("Tipo actual: %s\n", tipoActual);
     int pos=id_existe_en_ts(listaVariables[i]);
-	printf("Posicion: %d\n", pos);
     if(pos!=-1) {
-	  printf("Nombre variable %s: %s\n", listaVariables[i], tabla_simbolos[pos].nombre);
-	  //strcpy(tabla_simbolos[pos].tipo,tipoActual);
-	  tabla_simbolos[pos].tipo = tipoActual;
-	  printf("El tipo del ID es: %s\n", tabla_simbolos[pos].tipo);
-	  printf("Listo Variale Nro: %d\n\n", i+1);
-	  printf("%s\t%s\t%s\t%s\n", tabla_simbolos[pos].nombre, tabla_simbolos[pos].tipo, tabla_simbolos[pos].valor, tabla_simbolos[pos].longitud);
+	  char *tipoDato = (char*) malloc(10*sizeof(char));
+	  *tipoDato = '\0';
+	  strcat(tipoDato, tipoActual);
+	  tabla_simbolos[pos].tipo = tipoDato;
 	}
   }
 }
