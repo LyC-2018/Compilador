@@ -1,7 +1,8 @@
-DECVAR          -/ bloque de declaracion /-          
- a,b,c : INT
- d : FLOAT
- e,f : STRING
+-/ bloque de declaracion /-     
+DECVAR         
+ a,b : INT
+ c : FLOAT
+ d,e : STRING
 ENDDEC
 
 a = (5 * 8) - z

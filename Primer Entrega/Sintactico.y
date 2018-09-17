@@ -8,6 +8,10 @@
 FILE *yyin;
 char *yytext;
 extern int yylineno;
+char tipoActual[10]={""};
+char listaVariables[10][20]={""};
+int variableActual=0;
+void reinicioVariables();
 
 %}
 
@@ -42,21 +46,21 @@ programa: declaracion { printf("Declaracion OK\n"); } bloque
         | bloque
 		;
 		
-declaracion: DECVAR listaVar ENDDEC
+declaracion: DECVAR variables ENDDEC { mostrar_ts(); }
 		   | DECVAR ENDDEC
 		   ;
 		   
-listaVar: variables
-        | listaVar variables
-		;
+variables: variables listavar DOS_PUNTOS tipo { guardarTipos(variableActual, listaVariables, tipoActual); reinicioVariables(); }
+	     | listavar DOS_PUNTOS tipo { guardarTipos(variableActual, listaVariables, tipoActual); reinicioVariables(); }   
+         ;
 
-variables: ID DOS_PUNTOS tipo
-		 | ID COMA variables
-		 ;
+listavar: listavar COMA ID { strcpy(listaVariables[variableActual++],$3); }
+	    | ID { strcpy(listaVariables[variableActual++],$1); } 
+        ;
 	
-tipo: INT
-    | FLOAT
-	| STRING
+tipo: INT    { strcpy(tipoActual,"INT"); }
+    | FLOAT  { strcpy(tipoActual,"REAL"); }
+	| STRING { strcpy(tipoActual,"STRING"); }
 	;
 		
 bloque: sentencia
@@ -148,8 +152,12 @@ int main(int argc,char *argv[])
   }
   else
   {
+	printf("Prueba.txt ABIERTO\n");
 	yyparse();
+	printf("Termino el PARSEO\n");
+	//mostrar_ts();
 	save_reg_ts();
+	printf("Listo TS\n");
   }
   fclose(yyin);
   return 0;
@@ -161,6 +169,11 @@ int yyerror(char *errMessage)
    fprintf(stderr, "Fin de ejecucion.\n");
    system ("Pause");
    exit (1);
+}
+
+void reinicioVariables() {
+	variableActual=0;
+    strcpy(tipoActual,"");
 }
 
 

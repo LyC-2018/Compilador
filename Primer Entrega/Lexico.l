@@ -38,6 +38,8 @@ int id_existe_en_ts(char *id);
 void mensaje_error();
 void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longitud);
 void save_reg_ts();
+void mostrar_ts();
+void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual[]);
 
 %}
 
@@ -252,8 +254,8 @@ int id_existe_en_ts(char *id)
 {
 	int i;
 	for(i=0;i<cant_reg;i++){
-		if (strcmp(id, tabla_simbolos[i].nombre) == 0)
-			return 1;
+		if (strcmpi(id, tabla_simbolos[i].nombre) == 0)
+			return i;
 	}
 	return -1;
 }
@@ -289,4 +291,39 @@ void save_reg_ts()
 		}		
 		fclose(file);
 	}
+}
+
+void mostrar_ts()
+{
+	printf("\n\nMOSTRAR COMO QUEDO LA TS \n");
+	int i = 0;
+	for (i; i < cant_reg; i++) 
+	{
+		printf("%s\t%s\t%s\t%s\n", tabla_simbolos[i].nombre, tabla_simbolos[i].tipo, tabla_simbolos[i].valor, tabla_simbolos[i].longitud);	
+	}
+	printf("\n");
+}
+
+/* 
+	Funcion para actualizar el tipo de una variable en la tabla de simbolos
+*/
+
+void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual[]){
+  printf("Cantidad de variables del tipo %s: %d\n", tipoActual, variableActual);  
+  int i;
+  
+  for(i=0; i<variableActual; i++){
+	printf("\nVariables Actual: %s\n", listaVariables[i]);
+	printf("Tipo actual: %s\n", tipoActual);
+    int pos=id_existe_en_ts(listaVariables[i]);
+	printf("Posicion: %d\n", pos);
+    if(pos!=-1) {
+	  printf("Nombre variable %s: %s\n", listaVariables[i], tabla_simbolos[pos].nombre);
+	  //strcpy(tabla_simbolos[pos].tipo,tipoActual);
+	  tabla_simbolos[pos].tipo = tipoActual;
+	  printf("El tipo del ID es: %s\n", tabla_simbolos[pos].tipo);
+	  printf("Listo Variale Nro: %d\n\n", i+1);
+	  printf("%s\t%s\t%s\t%s\n", tabla_simbolos[pos].nombre, tabla_simbolos[pos].tipo, tabla_simbolos[pos].valor, tabla_simbolos[pos].longitud);
+	}
+  }
 }
