@@ -33,9 +33,10 @@ int insertar_ctereal_en_ts(float flotante);
 
 int validarID(char *str);
 int insertar_id_en_ts(char *id);
-int id_existe_en_ts(char *id);
+
 
 void mensaje_error();
+int nombre_existe_en_ts(char *id);
 void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longitud);
 void save_reg_ts();
 void mostrar_ts();
@@ -155,7 +156,8 @@ int insertar_cteint_en_ts(int entero)
 	strcat(nombre, "_");
 	strcat(nombre, valor);
 	
-	insertar_tabla_simbolos(nombre, "CTE_INT", valor, "-");
+	if (nombre_existe_en_ts(nombre) == -1)
+		insertar_tabla_simbolos(nombre, "CTE_INT", valor, "-");
 	return 1;
 }
 
@@ -186,7 +188,8 @@ int insertar_ctestring_en_ts(char *str)
 	char *longitud = (char*) malloc(10*sizeof(char));	
 	itoa(strlen(str), longitud, 10);
 
-	insertar_tabla_simbolos(nombre, "CTE_STRING", str, longitud);
+	if (nombre_existe_en_ts(nombre) == -1)
+		insertar_tabla_simbolos(nombre, "CTE_STRING", str, longitud);
 	return 1;
 }
 
@@ -217,7 +220,8 @@ int insertar_ctereal_en_ts(float flotante)
 	strcat(nombre, "_");
 	strcat(nombre, valor);
 	
-	insertar_tabla_simbolos(nombre, "CTE_REAL", valor, "-");
+	if (nombre_existe_en_ts(nombre) == -1)
+		insertar_tabla_simbolos(nombre, "CTE_REAL", valor, "-");
 	return 1;
 }
 
@@ -242,15 +246,12 @@ int validarID(char *str)
 
 int insertar_id_en_ts(char *id)
 {
-	if (id_existe_en_ts(id) == -1) 
-	{
+	if (nombre_existe_en_ts(id) == -1) 
 		insertar_tabla_simbolos(id, "","","-");
-	}
-
 	return 1;
 }
 
-int id_existe_en_ts(char *id) 
+int nombre_existe_en_ts(char *id) 
 {
 	int i;
 	for(i=0;i<cant_reg;i++){
@@ -312,7 +313,7 @@ void mostrar_ts()
 void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual[]){
   int i;
   for(i=0; i<variableActual; i++){
-    int pos=id_existe_en_ts(listaVariables[i]);
+    int pos=nombre_existe_en_ts(listaVariables[i]);
     if(pos!=-1) {
 	  char *tipoDato = (char*) malloc(10*sizeof(char));
 	  *tipoDato = '\0';
