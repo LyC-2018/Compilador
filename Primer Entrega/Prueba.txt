@@ -5,7 +5,7 @@ DECVAR
  d,e : STRING
 ENDDEC
 
-a = (5 * 8) - z
+a = (-5 * 8) + z
 WRITE a
 
 WHILE (AVG([2.3]) == 2.3 OR 1==1)
@@ -13,7 +13,7 @@ WHILE (AVG([2.3]) == 2.3 OR 1==1)
 ENDWHILE
 
 IF (((2 * 1) - 1) == 1 )
-    a = AVG([2,a+b,c*(d+e),48])
+    a = AVG([2,a+b,c*(d+e),AVG([48+2])])
 ENDIF
 
 WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34+d) ; 48]) AND b == 1)

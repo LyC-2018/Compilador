@@ -56,8 +56,8 @@ COMENTARIO_S    -\/{VALID_STRING}\/-
 COMENTARIO      ({COMENTARIO_S}|-\/{VALID_STRING}{COMENTARIO_S}{VALID_STRING}\/-)+
                 
 CTE_STRING      \"{VALID_STRING}\"
-CTE_REAL        {DIGITO}+"."{DIGITO}*
-CTE_INT         {DIGITO}+
+CTE_REAL        -?{DIGITO}+"."{DIGITO}*
+CTE_INT         -?{DIGITO}+
 ID				{LETRA}({LETRA}|{DIGITO}|_)*
 INLIST          [Ii][Nn][Ll][Ii][Ss][Tt]
 AVG				[Aa][Vv][Gg]
