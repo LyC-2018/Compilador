@@ -5,7 +5,7 @@ DECVAR
  d,e : STRING
 ENDDEC
 
-a = (-5 * 8) + z
+a = (-5 * 8) + b
 WRITE a
 
 WHILE (AVG([2.3]) == 2.3 OR 1==1)
@@ -18,16 +18,16 @@ ENDIF
 
 WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34+d) ; 48]) AND b == 1)
     a = 1
-    IF (X == 10)
+    IF (C == 10)
         a = a + 1
     ENDIF
 ENDWHILE
 
-IF (X != "Holaa    Mundo")
-    Z = X
+IF (E != "Holaa    Mundo")
+    D = E
 ELSE
-    X = Z
-    READ X      -/ lectura de variable -/ READ X /- entrada /-
+    E = D
+    READ E      -/ lectura de variable -/ READ X /- entrada /-
 ENDIF
 
 WRITE "Compilacion Exitosa"

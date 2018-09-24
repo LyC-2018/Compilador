@@ -54,8 +54,8 @@ variables: variables listavar DOS_PUNTOS tipo { guardarTipos(variableActual, lis
 	     | listavar DOS_PUNTOS tipo { guardarTipos(variableActual, listaVariables, tipoActual); reinicioVariables(); }   
          ;
 
-listavar: listavar COMA ID { strcpy(listaVariables[variableActual++],$3); }
-	    | ID { strcpy(listaVariables[variableActual++],$1); } 
+listavar: listavar COMA ID { strcpy(listaVariables[variableActual++],$3); insertar_id_en_ts($3); }
+	    | ID { strcpy(listaVariables[variableActual++],$1); insertar_id_en_ts($1); } 
         ;
 	
 tipo: INT    { strcpy(tipoActual,"INT"); }
@@ -106,7 +106,7 @@ avg_expresiones: expresion
 			   | expresion COMA avg_expresiones
 			   ;
 
-inlist: INLIST P_A ID COMA C_A inlist_expresiones C_C P_C
+inlist: INLIST P_A ID COMA C_A inlist_expresiones C_C P_C	{ existe_en_ts($3); }
 	  ;
 
 inlist_expresiones: expresion
@@ -123,7 +123,7 @@ termino: termino OP_MULT factor { printf("Multiplicacion OK\n"); }
 	   | factor
 	   ;
 	   
-factor: ID	              { printf("ID es: %s\n",yylval.strVal); }  
+factor: ID	              { existe_en_ts($1); printf("ID es: %s\n",yylval.strVal); }  
 	  | constante
 	  | P_A expresion P_C
 	  | average           { printf("AVG OK\n"); }
@@ -138,7 +138,7 @@ entrada: READ ID
        ;
 	   
 salida: WRITE CTE_STRING
-      | WRITE ID
+      | WRITE ID 			{ existe_en_ts($2); }
 	  ;
 	  
 %%

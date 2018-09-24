@@ -37,6 +37,7 @@ int insertar_id_en_ts(char *id);
 
 void mensaje_error();
 int nombre_existe_en_ts(char *id);
+void existe_en_ts(char *id);
 void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longitud);
 void save_reg_ts();
 void mostrar_ts();
@@ -118,7 +119,7 @@ WRITE			[Ww][Rr][Ii][Tt][Ee]
 "=="            { return IGUAL; }
 "!="            { return DISTINTO; }
 
-{ID}			{ yylval.strVal = strdup(yytext); validarID(yylval.strVal); insertar_id_en_ts(yylval.strVal); return ID; }
+{ID}			{ yylval.strVal = strdup(yytext); validarID(yylval.strVal); return ID; }
 {CTE_STRING}	{ yylval.strVal = strdup(yytext); validarString(yylval.strVal); insertar_ctestring_en_ts(yylval.strVal); return CTE_STRING; }
 {CTE_INT}		{ yylval.intVal = atoi(yytext); validarInt(yylval.intVal); insertar_cteint_en_ts(yylval.intVal); return CTE_INT; }
 {CTE_REAL}		{ yylval.realVal = atof(yytext); validarReal(yylval.realVal); insertar_ctereal_en_ts(yylval.realVal); return CTE_REAL; }
@@ -259,6 +260,17 @@ int nombre_existe_en_ts(char *id)
 			return i;
 	}
 	return -1;
+}
+
+/* 
+	Funcion para comprobar que un simbolo existe en la tabla de simbolos
+*/
+
+void existe_en_ts (char *id){
+  if(nombre_existe_en_ts(id)==-1){
+	printf("\nERROR: ID no declarado\n");
+    yyerror();
+  }
 }
 
 
