@@ -45,7 +45,8 @@ void save_tercetos();
 
 /**** INICIO INLIST ****/
 int inlist_indice_id;
-int inlist_variable_aux;
+int inlist_saltos_a_completar[15];
+int inlist_cant_saltos;
 
 /**** FIN INLIST ****/
 
@@ -110,7 +111,7 @@ sentencia: asignacion { printf("Asignacion OK\n"); }
 		 | salida     { printf("Salida OK\n"); }
 		 ;
 		 
-asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cci("=", $1, IndExpresion); }
+asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cii("=", crearTerceto_ccc($1, "",""), IndExpresion); }
 		  ;
 
 iteracion: WHILE P_A condicion P_C bloque ENDWHILE
@@ -144,21 +145,31 @@ avg_expresiones: expresion
 			   ;
 
 inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", ""); } COMA 
-		C_A inlist_expresiones C_C P_C
+		C_A inlist_expresiones C_C P_C  {   int i;
+											for (i=0; i<inlist_cant_saltos; i++) {
+												char *salto = (char*) malloc(sizeof(int));
+												itoa(terceto_index, salto, 10);
+												tercetos[inlist_saltos_a_completar[i]].dos = salto;
+											}
+
+											// TODO: hay que ver como implementamos las condiciones
+											// si llega hasta acá significaría que ninguna comparación dio igual
+											// o salta a un else, o la prox condicion, o algo
+											crearTerceto_ccc("BI", "","");
+											}
 	  ;
 
 inlist_expresiones: expresion { 
-								crearTerceto_ccc($3, "", "");
-								crearTerceto_cci("=", "-INLIST_AUX", 0); // asi estará bn o esta var aux tmb tendría que estar en un terceto?
+								inlist_cant_saltos = 0;
 								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
-								crearTerceto_cic("BNE", IndInlist+3, ""); // cmp, bne y la asig 
-								IndInlist = crearTerceto_cci("=", "-INLIST_AUX", 1); 
+								inlist_saltos_a_completar[inlist_cant_saltos] = crearTerceto_ccc("BEQ", "", "");  
+								inlist_cant_saltos++;
 								}
 		          | inlist_expresiones PUNTO_COMA expresion {
 								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
-								crearTerceto_cic("BNE", IndInlist+3, ""); // cmp, bne y la asig 
-								IndInlist = crearTerceto_cci("=", "-INLIST_AUX", 1);
-				  				}
+								inlist_saltos_a_completar[inlist_cant_saltos] = crearTerceto_ccc("BEQ", "", "");  
+								inlist_cant_saltos++;
+								}
 		          ;
 		  
 expresion: expresion OP_SUMA termino  { IndExpresion = crearTerceto_cii("+", IndExpresion, IndTermino); }
@@ -200,7 +211,6 @@ int main(int argc,char *argv[])
   }
   else
   {
-	crear_ids_reservados_en_ts();
 	yyparse();
 	//mostrar_ts();
 	save_reg_ts();
