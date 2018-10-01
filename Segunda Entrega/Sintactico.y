@@ -145,18 +145,20 @@ avg_expresiones: expresion
 			   ;
 
 inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", ""); } COMA 
-		C_A inlist_expresiones C_C P_C  {   int i;
+		C_A inlist_expresiones C_C P_C  {   
+											// TODO: hay que ver como implementamos las condiciones
+											// si llega hasta acá significaría que ninguna comparación dio igual
+											// o salta a un else, o la prox condicion, o algo
+											crearTerceto_ccc("BI", "","");
+											
+											// aca completo los saltos por la pos actual de tercetos
+											int i;
 											for (i=0; i<inlist_cant_saltos; i++) {
 												char *salto = (char*) malloc(sizeof(int));
 												itoa(terceto_index, salto, 10);
 												tercetos[inlist_saltos_a_completar[i]].dos = salto;
 											}
-
-											// TODO: hay que ver como implementamos las condiciones
-											// si llega hasta acá significaría que ninguna comparación dio igual
-											// o salta a un else, o la prox condicion, o algo
-											crearTerceto_ccc("BI", "","");
-											}
+										}
 	  ;
 
 inlist_expresiones: expresion { 
