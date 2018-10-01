@@ -23,6 +23,7 @@ int IndAsignacion;
 int IndExpresion;
 int IndTermino;
 int IndFactor;
+int IndInlist;
 
 struct terceto {
 	char *uno;
@@ -37,9 +38,16 @@ int crearTerceto_cci(char *uno, char *dos, int tres);
 int crearTerceto_cii(char *uno, int dos, int tres);
 int crearTerceto_fcc(float uno, char *dos, char *tres);
 int crearTerceto_icc(int uno, char *dos, char *tres);
+int crearTerceto_cic(char *uno, int dos, char *tres);
 
 void save_tercetos();
 /**** FIN TERCETOS ****/
+
+/**** INICIO INLIST ****/
+int inlist_indice_id;
+int inlist_variable_aux;
+
+/**** FIN INLIST ****/
 
 %}
 
@@ -135,11 +143,22 @@ avg_expresiones: expresion
 			   | expresion COMA avg_expresiones
 			   ;
 
-inlist: INLIST P_A ID COMA C_A inlist_expresiones C_C P_C	{ existe_en_ts($3); }
+inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", ""); } COMA 
+		C_A inlist_expresiones C_C P_C
 	  ;
 
-inlist_expresiones: expresion
-		          | inlist_expresiones PUNTO_COMA expresion
+inlist_expresiones: expresion { 
+								crearTerceto_ccc($3, "", "");
+								crearTerceto_cci("=", "-INLIST_AUX", 0); // asi estará bn o esta var aux tmb tendría que estar en un terceto?
+								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
+								crearTerceto_cic("BNE", IndInlist+3, ""); // cmp, bne y la asig 
+								IndInlist = crearTerceto_cci("=", "-INLIST_AUX", 1); 
+								}
+		          | inlist_expresiones PUNTO_COMA expresion {
+								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
+								crearTerceto_cic("BNE", IndInlist+3, ""); // cmp, bne y la asig 
+								IndInlist = crearTerceto_cci("=", "-INLIST_AUX", 1);
+				  				}
 		          ;
 		  
 expresion: expresion OP_SUMA termino  { IndExpresion = crearTerceto_cii("+", IndExpresion, IndTermino); }
@@ -181,6 +200,7 @@ int main(int argc,char *argv[])
   }
   else
   {
+	crear_ids_reservados_en_ts();
 	yyparse();
 	//mostrar_ts();
 	save_reg_ts();
@@ -245,6 +265,13 @@ int crearTerceto_icc(int uno, char *dos, char *tres) {
 	itoa(uno, uno_char, 10);
 	
 	return crearTerceto_ccc(uno_char, dos, tres);
+}
+
+int crearTerceto_cic(char *uno, int dos, char *tres) {
+	char *dos_char = (char*) malloc(sizeof(int));
+	itoa(dos, dos_char, 10);
+	
+	return crearTerceto_ccc(uno, dos_char, tres);
 }
 
 void save_tercetos() {

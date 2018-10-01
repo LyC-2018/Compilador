@@ -42,6 +42,7 @@ void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longit
 void save_reg_ts();
 void mostrar_ts();
 void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual[]);
+void crear_ids_reservados_en_ts();
 
 %}
 
@@ -333,4 +334,11 @@ void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual
 	  tabla_simbolos[pos].tipo = tipoDato;
 	}
   }
+}
+
+/*
+	Funcion para crear en la tabla de simbolos las variables auxiliares del compilador 
+*/
+void crear_ids_reservados_en_ts() {
+	insertar_id_en_ts("-INLIST_AUX");
 }
