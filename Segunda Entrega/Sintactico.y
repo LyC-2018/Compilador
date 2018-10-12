@@ -53,6 +53,7 @@ int inlist_cant_saltos;
 /**** INICIO IF ****/
 char valor_comparacion[3];
 int if_salto_a_completar;
+int if_indice_primercond;
 /**** FIN IF ****/
 %}
 
@@ -121,7 +122,7 @@ asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cii("=", crearTerce
 iteracion: WHILE P_A condicion P_C bloque ENDWHILE
 		 ;
 		
-decision: IF P_A condicion P_C { crearTerceto_cii("CMP", 1, 1); /*falta apuntar, ver donde tendría esto*/  if_salto_a_completar = crearTerceto_ccc(valor_comparacion, "", ""); } 
+decision: IF P_A condicion P_C { if_salto_a_completar = crearTerceto_ccc(valor_comparacion, "", ""); } 
 			 decision_bloque
 		;
 
@@ -137,7 +138,7 @@ condicion: comparacion
 		 | NOT P_A comparacion P_C
 		 ;
 
-comparacion: expresion MENOR expresion       { strcpy(valor_comparacion, "BGE"); }
+comparacion: expresion { if_indice_primercond = IndExpresion; } MENOR expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGE"); }
 		   | expresion MENOR_IGUAL expresion { printf("Condicion menor o igual OK\n"); }
 		   | expresion MAYOR expresion       { printf("Condicion mayor OK\n"); }
 		   | expresion MAYOR_IGUAL expresion { printf("Condicion mayor o igual OK\n"); }
