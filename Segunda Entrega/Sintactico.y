@@ -23,6 +23,7 @@ int IndAsignacion;
 int IndExpresion;
 int IndTermino;
 int IndFactor;
+int IndInlist;
 
 struct terceto {
 	char *uno;
@@ -37,9 +38,17 @@ int crearTerceto_cci(char *uno, char *dos, int tres);
 int crearTerceto_cii(char *uno, int dos, int tres);
 int crearTerceto_fcc(float uno, char *dos, char *tres);
 int crearTerceto_icc(int uno, char *dos, char *tres);
+int crearTerceto_cic(char *uno, int dos, char *tres);
 
 void save_tercetos();
 /**** FIN TERCETOS ****/
+
+/**** INICIO INLIST ****/
+int inlist_indice_id;
+int inlist_saltos_a_completar[15];
+int inlist_cant_saltos;
+
+/**** FIN INLIST ****/
 
 %}
 
@@ -102,7 +111,7 @@ sentencia: asignacion { printf("Asignacion OK\n"); }
 		 | salida     { printf("Salida OK\n"); }
 		 ;
 		 
-asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cci("=", $1, IndExpresion); }
+asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cii("=", crearTerceto_ccc($1, "",""), IndExpresion); }
 		  ;
 
 iteracion: WHILE P_A condicion P_C bloque ENDWHILE
@@ -135,11 +144,34 @@ avg_expresiones: expresion
 			   | expresion COMA avg_expresiones
 			   ;
 
-inlist: INLIST P_A ID COMA C_A inlist_expresiones C_C P_C	{ existe_en_ts($3); }
+inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", ""); } COMA 
+		C_A inlist_expresiones C_C P_C  {   
+											// TODO: hay que ver como implementamos las condiciones
+											// si llega hasta acá significaría que ninguna comparación dio igual
+											// o salta a un else, o la prox condicion, o algo
+											crearTerceto_ccc("BI", "","");
+											
+											// aca completo los saltos por la pos actual de tercetos
+											int i;
+											for (i=0; i<inlist_cant_saltos; i++) {
+												char *salto = (char*) malloc(sizeof(int));
+												itoa(terceto_index, salto, 10);
+												tercetos[inlist_saltos_a_completar[i]].dos = salto;
+											}
+										}
 	  ;
 
-inlist_expresiones: expresion
-		          | inlist_expresiones PUNTO_COMA expresion
+inlist_expresiones: expresion { 
+								inlist_cant_saltos = 0;
+								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
+								inlist_saltos_a_completar[inlist_cant_saltos] = crearTerceto_ccc("BEQ", "", "");  
+								inlist_cant_saltos++;
+								}
+		          | inlist_expresiones PUNTO_COMA expresion {
+								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
+								inlist_saltos_a_completar[inlist_cant_saltos] = crearTerceto_ccc("BEQ", "", "");  
+								inlist_cant_saltos++;
+								}
 		          ;
 		  
 expresion: expresion OP_SUMA termino  { IndExpresion = crearTerceto_cii("+", IndExpresion, IndTermino); }
@@ -245,6 +277,13 @@ int crearTerceto_icc(int uno, char *dos, char *tres) {
 	itoa(uno, uno_char, 10);
 	
 	return crearTerceto_ccc(uno_char, dos, tres);
+}
+
+int crearTerceto_cic(char *uno, int dos, char *tres) {
+	char *dos_char = (char*) malloc(sizeof(int));
+	itoa(dos, dos_char, 10);
+	
+	return crearTerceto_ccc(uno, dos_char, tres);
 }
 
 void save_tercetos() {
