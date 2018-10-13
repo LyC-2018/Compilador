@@ -128,7 +128,7 @@ decision: IF P_A condicion P_C { if_salto_a_completar = crearTerceto_ccc(valor_c
 
 decision_bloque: 
 		  bloque ENDIF { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[if_salto_a_completar].dos = salto; }
-		| bloque ELSE bloque ENDIF 
+		| bloque { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index+1, salto, 10); tercetos[if_salto_a_completar].dos = salto; if_salto_a_completar = crearTerceto_ccc("BI", "",""); } ELSE bloque ENDIF { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[if_salto_a_completar].dos = salto; }
 		;
 
 condicion: comparacion
