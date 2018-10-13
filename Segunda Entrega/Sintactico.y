@@ -138,12 +138,12 @@ condicion: comparacion
 		 | NOT P_A comparacion P_C
 		 ;
 
-comparacion: expresion { if_indice_primercond = IndExpresion; } MENOR expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGE"); }
-		   | expresion MENOR_IGUAL expresion { printf("Condicion menor o igual OK\n"); }
-		   | expresion MAYOR expresion       { printf("Condicion mayor OK\n"); }
-		   | expresion MAYOR_IGUAL expresion { printf("Condicion mayor o igual OK\n"); }
-		   | expresion IGUAL expresion       { printf("Condicion igual OK\n"); }
-		   | expresion DISTINTO expresion    { printf("Condicion distinto OK\n"); }
+comparacion: expresion { if_indice_primercond = IndExpresion; } MENOR expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGE"); }
+		   | expresion { if_indice_primercond = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGT"); }
+		   | expresion { if_indice_primercond = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BLE"); }
+		   | expresion { if_indice_primercond = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BLT"); }
+		   | expresion { if_indice_primercond = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BNE"); }
+		   | expresion { if_indice_primercond = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BEQ"); }
 		   | inlist                          { printf("INLIST OK\n"); }
 		   ; 
 
