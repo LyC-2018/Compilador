@@ -127,8 +127,10 @@ WRITE			[Ww][Rr][Ii][Tt][Ee]
 " "
 "\t"
 "\n"		    
+"\r\n"
 {COMENTARIO}   
 
+.    { printf("\nCaracter invalido!\n");  exit(1);}
 %%
 
 
