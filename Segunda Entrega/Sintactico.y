@@ -50,6 +50,11 @@ int inlist_cant_saltos;
 
 /**** FIN INLIST ****/
 
+/**** INICIO IF ****/
+char valor_comparacion[3];
+int if_salto_a_completar;
+int if_indice_primercond;
+/**** FIN IF ****/
 %}
 
 %union {
@@ -117,8 +122,13 @@ asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cii("=", crearTerce
 iteracion: WHILE P_A condicion P_C bloque ENDWHILE
 		 ;
 		
-decision: IF P_A condicion P_C bloque ENDIF
-		| IF P_A condicion P_C bloque ELSE bloque ENDIF
+decision: IF P_A condicion P_C { if_salto_a_completar = crearTerceto_ccc(valor_comparacion, "", ""); } 
+			 decision_bloque
+		;
+
+decision_bloque: 
+		  bloque ENDIF { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[if_salto_a_completar].dos = salto; }
+		| bloque { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index+1, salto, 10); tercetos[if_salto_a_completar].dos = salto; if_salto_a_completar = crearTerceto_ccc("BI", "",""); } ELSE bloque ENDIF { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[if_salto_a_completar].dos = salto; }
 		;
 
 condicion: comparacion
@@ -128,13 +138,13 @@ condicion: comparacion
 		 | NOT P_A comparacion P_C
 		 ;
 
-comparacion: expresion MENOR expresion       { printf("Condicion menor OK\n"); }
-		   | expresion MENOR_IGUAL expresion { printf("Condicion menor o igual OK\n"); }
-		   | expresion MAYOR expresion       { printf("Condicion mayor OK\n"); }
-		   | expresion MAYOR_IGUAL expresion { printf("Condicion mayor o igual OK\n"); }
-		   | expresion IGUAL expresion       { printf("Condicion igual OK\n"); }
-		   | expresion DISTINTO expresion    { printf("Condicion distinto OK\n"); }
-		   | inlist                          { printf("INLIST OK\n"); }
+comparacion: expresion { if_indice_primercond = IndExpresion; } MENOR expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGE"); }
+		   | expresion { if_indice_primercond = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGT"); }
+		   | expresion { if_indice_primercond = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BLE"); }
+		   | expresion { if_indice_primercond = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BLT"); }
+		   | expresion { if_indice_primercond = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BNE"); }
+		   | expresion { if_indice_primercond = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BEQ"); }
+		   | inlist    { strcpy(valor_comparacion, "BI"); /* si llego hasta acá es que no encontré coincidencia */ }
 		   ; 
 
 average: AVG P_A C_A avg_expresiones C_C P_C
@@ -146,16 +156,11 @@ avg_expresiones: expresion
 
 inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", ""); } COMA 
 		C_A inlist_expresiones C_C P_C  {   
-											// TODO: hay que ver como implementamos las condiciones
-											// si llega hasta acá significaría que ninguna comparación dio igual
-											// o salta a un else, o la prox condicion, o algo
-											crearTerceto_ccc("BI", "","");
-											
-											// aca completo los saltos por la pos actual de tercetos
+											// aca completo los saltos por la pos actual de tercetos +1 (por el BI)
 											int i;
 											for (i=0; i<inlist_cant_saltos; i++) {
 												char *salto = (char*) malloc(sizeof(int));
-												itoa(terceto_index, salto, 10);
+												itoa(terceto_index+1, salto, 10);
 												tercetos[inlist_saltos_a_completar[i]].dos = salto;
 											}
 										}
