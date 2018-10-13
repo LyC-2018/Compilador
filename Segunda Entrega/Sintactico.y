@@ -50,10 +50,18 @@ int inlist_cant_saltos;
 
 /**** FIN INLIST ****/
 
-/**** INICIO IF ****/
+/**** INICIO COMPARACION ****/
 char valor_comparacion[3];
+int IndComparacion;
+/**** FIN COMPARACION ****/
+
+/**** INICIO IF ****/
 int if_salto_a_completar;
-int if_indice_primercond;
+/**** FIN IF ****/
+
+/**** INICIO WHILE ****/
+int while_pos_inicio;
+int while_salto_a_completar;
 /**** FIN IF ****/
 %}
 
@@ -119,7 +127,8 @@ sentencia: asignacion { printf("Asignacion OK\n"); }
 asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cii("=", crearTerceto_ccc($1, "",""), IndExpresion); }
 		  ;
 
-iteracion: WHILE P_A condicion P_C bloque ENDWHILE
+iteracion: WHILE P_A { while_pos_inicio = terceto_index; } condicion P_C { while_salto_a_completar = crearTerceto_ccc(valor_comparacion, "", ""); } 
+			bloque ENDWHILE { crearTerceto_cic("BI", while_pos_inicio, ""); char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[while_salto_a_completar].dos = salto; }
 		 ;
 		
 decision: IF P_A condicion P_C { if_salto_a_completar = crearTerceto_ccc(valor_comparacion, "", ""); } 
@@ -138,12 +147,12 @@ condicion: comparacion
 		 | NOT P_A comparacion P_C
 		 ;
 
-comparacion: expresion { if_indice_primercond = IndExpresion; } MENOR expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGE"); }
-		   | expresion { if_indice_primercond = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BGT"); }
-		   | expresion { if_indice_primercond = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BLE"); }
-		   | expresion { if_indice_primercond = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BLT"); }
-		   | expresion { if_indice_primercond = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BNE"); }
-		   | expresion { if_indice_primercond = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", if_indice_primercond, IndExpresion); strcpy(valor_comparacion, "BEQ"); }
+comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BGE"); }
+		   | expresion { IndComparacion = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BGT"); }
+		   | expresion { IndComparacion = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BLE"); }
+		   | expresion { IndComparacion = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BLT"); }
+		   | expresion { IndComparacion = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BNE"); }
+		   | expresion { IndComparacion = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BEQ"); }
 		   | inlist    { strcpy(valor_comparacion, "BI"); /* si llego hasta acá es que no encontré coincidencia */ }
 		   ; 
 
