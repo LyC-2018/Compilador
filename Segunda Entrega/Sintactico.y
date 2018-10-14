@@ -66,6 +66,9 @@ void if_completar_ultimo_salto_guardado_con(int pos);
 /**** INICIO WHILE ****/
 int while_pos_inicio;
 int while_salto_a_completar;
+int while_pos_a_completar[11];
+int while_index = 0;
+void while_guardar_pos(int pos);
 /**** FIN IF ****/
 %}
 
@@ -131,8 +134,16 @@ sentencia: asignacion { printf("Asignacion OK\n"); }
 asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cii("=", crearTerceto_ccc($1, "",""), IndExpresion); }
 		  ;
 
-iteracion: WHILE P_A { while_pos_inicio = terceto_index; } condicion P_C { while_salto_a_completar = crearTerceto_ccc(valor_comparacion, "", ""); } 
-			bloque ENDWHILE { crearTerceto_cic("BI", while_pos_inicio, ""); char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[while_salto_a_completar].dos = salto; }
+iteracion: WHILE P_A { while_guardar_pos(terceto_index); } 
+			condicion P_C { while_guardar_pos(crearTerceto_ccc(valor_comparacion, "", "")); } 
+			bloque ENDWHILE { 
+				char *salto = (char*) malloc(sizeof(int)); 
+				itoa(terceto_index+1, salto, 10); 
+				tercetos[while_pos_a_completar[while_index]].dos = salto;
+				while_index--; 
+				crearTerceto_cic("BI", while_pos_a_completar[while_index], "");
+				while_index--; 
+				}
 		 ;
 		
 decision: IF P_A condicion P_C { if_guardar_salto(crearTerceto_ccc(valor_comparacion, "", "")); }
@@ -349,3 +360,17 @@ void if_completar_ultimo_salto_guardado_con(int pos) {
 	if_index--;
 	
 }
+
+/* Funcion para simil apilar las pos del while */
+void while_guardar_pos(int pos) {
+	if (if_index < 11) // se usa del 1 al 10 y se ocupan dos pos por cada while 
+	{
+		while_index++; 
+		while_pos_a_completar[while_index] = pos;
+	}
+	else
+	{
+		yyerror("No se puede tener más de 5 whiles anidados")
+	}
+}
+	
