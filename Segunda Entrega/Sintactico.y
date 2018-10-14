@@ -370,7 +370,7 @@ void while_guardar_pos(int pos) {
 	}
 	else
 	{
-		yyerror("No se puede tener más de 5 whiles anidados")
+		yyerror("No se puede tener más de 5 whiles anidados");
 	}
 }
 	
