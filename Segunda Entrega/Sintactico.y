@@ -57,8 +57,10 @@ int IndComparacion;
 
 /**** INICIO IF ****/
 int if_salto_a_completar;
-int if_saltos[5];
+int if_saltos[6];
 int if_index = 0;
+void if_guardar_salto(int pos);
+void if_completar_ultimo_salto_guardado_con(int pos);
 /**** FIN IF ****/
 
 /**** INICIO WHILE ****/
@@ -133,32 +135,15 @@ iteracion: WHILE P_A { while_pos_inicio = terceto_index; } condicion P_C { while
 			bloque ENDWHILE { crearTerceto_cic("BI", while_pos_inicio, ""); char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[while_salto_a_completar].dos = salto; }
 		 ;
 		
-decision: IF P_A condicion P_C { if_index++; if_saltos[if_index] = crearTerceto_ccc(valor_comparacion, "", ""); }
+decision: IF P_A condicion P_C { if_guardar_salto(crearTerceto_ccc(valor_comparacion, "", "")); }
 			 decision_bloque
 		;
 
 decision_bloque: 
-		  bloque ENDIF { 
-			char *salto = (char*) malloc(sizeof(int)); 
-			itoa(terceto_index, salto, 10); 
-			tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
-			strcpy(tercetos[if_saltos[if_index]].dos, salto);
-			if_index--;
-			}
-		| bloque { 
-			char *salto = (char*) malloc(sizeof(int)); 
-			itoa(terceto_index+1, salto, 10); 
-			tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
-			strcpy(tercetos[if_saltos[if_index]].dos, salto);
-			if_index--;
-			if_index++; if_saltos[if_index] = crearTerceto_ccc("BI", "",""); } 
-		  ELSE bloque ENDIF { 
-			char *salto = (char*) malloc(sizeof(int)); 
-			itoa(terceto_index, salto, 10); 
-			tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
-			strcpy(tercetos[if_saltos[if_index]].dos, salto);
-			if_index--;
-			}
+		  bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
+		| bloque { if_completar_ultimo_salto_guardado_con(terceto_index+1);
+			       if_guardar_salto(crearTerceto_ccc("BI", "","")); } 
+		  ELSE bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
 		;
 
 condicion: comparacion
@@ -340,4 +325,27 @@ void save_tercetos() {
 		}
 		fclose(file);
 	}
+}
+
+/* Funcion para simil apilar las posiciones y permitir ifs anidados */
+void if_guardar_salto(int pos) {
+	if (if_index < 6)
+	{
+		if_index++; 
+		if_saltos[if_index] = pos; 
+	}
+	else
+	{
+		yyerror("No se puede tener más de 5 ifs anidados\n");
+	}
+}
+
+/* Funcion para simil desapilar y completar las posiciones del if */
+void if_completar_ultimo_salto_guardado_con(int pos) {
+	char *salto = (char*) malloc(sizeof(int)); 
+	itoa(pos, salto, 10); 
+	tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
+	strcpy(tercetos[if_saltos[if_index]].dos, salto);
+	if_index--;
+	
 }
