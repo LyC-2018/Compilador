@@ -254,9 +254,12 @@ void reinicioVariables() {
 int crearTerceto_ccc(char *uno, char *dos, char *tres) {
 	struct terceto terc;
 	int index = terceto_index;
-	terc.uno = uno;
-	terc.dos = dos;
-	terc.tres = tres;
+	terc.uno = malloc(sizeof(char)*strlen(uno));
+	strcpy(terc.uno, uno);
+	terc.dos = malloc(sizeof(char)*strlen(dos));
+	strcpy(terc.dos, dos);
+	terc.tres = malloc(sizeof(char)*strlen(tres));
+	strcpy(terc.tres, tres);
 	tercetos[index] = terc;
 	terceto_index++;
 	return index; // devuelvo la pos del terceto creado
