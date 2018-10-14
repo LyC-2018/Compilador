@@ -57,6 +57,7 @@ int saltos_and_a_completar[6];
 int and_index = 0;
 void completar_salto_si_es_comparacion_AND(int pos);
 int pos_a_completar_OR;
+int es_negado = 0;
 /**** FIN COMPARACION ****/
 
 /**** INICIO IF ****/
@@ -179,17 +180,31 @@ condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; }
 				tercetos[pos_a_completar_OR].dos = (char*) malloc(sizeof(char)*strlen(salto));
 				strcpy(tercetos[pos_a_completar_OR].dos, salto);
 			}
-		 | NOT comparacion
-		 | NOT P_A comparacion P_C
+		 | NOT { es_negado = 1; } condicion_negada;
 		 ;
 
-comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BGE"); }
-		   | expresion { IndComparacion = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BGT"); }
-		   | expresion { IndComparacion = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BLE"); }
-		   | expresion { IndComparacion = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BLT"); }
-		   | expresion { IndComparacion = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BNE"); }
-		   | expresion { IndComparacion = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BEQ"); }
-		   | inlist    { strcpy(valor_comparacion, "BI"); /* si llego hasta acá es que no encontré coincidencia */ }
+condicion_negada: comparacion { es_negado = 0; }
+			|  P_A comparacion P_C { es_negado = 0; }
+
+comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+				if(es_negado == 0) { strcpy(valor_comparacion, "BGE"); } else { strcpy(valor_comparacion, "BLT"); }
+			 }
+		   | expresion { IndComparacion = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+				if(es_negado == 0) { strcpy(valor_comparacion, "BGT"); } else { strcpy(valor_comparacion, "BLE"); } 
+			 }
+		   | expresion { IndComparacion = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BLE"); } else { strcpy(valor_comparacion, "BGT"); } 
+			 } 
+		   | expresion { IndComparacion = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BLT"); } else { strcpy(valor_comparacion, "BGE"); }
+			 } 
+		   | expresion { IndComparacion = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BNE"); } else { strcpy(valor_comparacion, "BEQ"); }
+			 } 
+		   | expresion { IndComparacion = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BEQ"); } else { strcpy(valor_comparacion, "BNE"); }
+			 } 
+		   | inlist { strcpy(valor_comparacion, "BI"); /* si llego hasta acá es que no encontré coincidencia */ }
 		   ; 
 
 average: AVG P_A C_A avg_expresiones C_C P_C
