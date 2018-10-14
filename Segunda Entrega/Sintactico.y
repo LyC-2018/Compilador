@@ -225,11 +225,8 @@ condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; gu
 				tercetos[pos_a_completar_OR].dos = (char*) malloc(sizeof(char)*strlen(salto));
 				strcpy(tercetos[pos_a_completar_OR].dos, salto);
 			}
-		 | NOT { guardar_condicion_no_tiene_inlist_negado(); es_negado = 1; } condicion_negada;
+		 | NOT { guardar_condicion_no_tiene_inlist_negado(); es_negado = 1; } comparacion { es_negado = 0; };
 		 ;
-
-condicion_negada: comparacion { es_negado = 0; }
-		        ;
 
 comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 				if(es_negado == 0) { strcpy(valor_comparacion, "BGE"); } else { strcpy(valor_comparacion, "BLT"); }
