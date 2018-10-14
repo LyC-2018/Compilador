@@ -47,12 +47,29 @@ void save_tercetos();
 int inlist_indice_id;
 int inlist_saltos_a_completar[15];
 int inlist_cant_saltos;
+int inlist_tengo_que_completar[15];
+int inlist_index;
 
+int index_inlist_negados = 0;
+struct cond_inlist_negado {
+	int tiene_inlist_negado;
+	int cantidad_saltos;
+	int posiciones[15];
+};
+struct cond_inlist_negado inlist_negados[15];
+
+void completar_salto_si_es_inlist_negado(int pos);
+void guardar_condicion_no_tiene_inlist_negado();
 /**** FIN INLIST ****/
 
 /**** INICIO COMPARACION ****/
 char valor_comparacion[3];
 int IndComparacion;
+int saltos_and_a_completar[6];
+int and_index = 0;
+void completar_salto_si_es_comparacion_AND(int pos);
+int pos_a_completar_OR;
+int es_negado = 0;
 /**** FIN COMPARACION ****/
 
 /**** INICIO IF ****/
@@ -135,7 +152,7 @@ asignacion: ID ASIG expresion { IndAsignacion = crearTerceto_cii("=", crearTerce
 		  ;
 
 iteracion: WHILE P_A { while_guardar_pos(terceto_index); } 
-			condicion P_C { while_guardar_pos(crearTerceto_ccc(valor_comparacion, "", "")); } 
+			condicion P_C { if(strcmp(valor_comparacion, "") != 0) while_guardar_pos(crearTerceto_ccc(valor_comparacion, "", "")); else while_index++; } 
 			bloque ENDWHILE { 
 				char *salto = (char*) malloc(sizeof(int)); 
 				itoa(terceto_index+1, salto, 10); 
@@ -143,34 +160,69 @@ iteracion: WHILE P_A { while_guardar_pos(terceto_index); }
 				while_index--; 
 				crearTerceto_cic("BI", while_pos_a_completar[while_index], "");
 				while_index--; 
+				completar_salto_si_es_comparacion_AND(terceto_index);
+				completar_salto_si_es_inlist_negado(terceto_index);
 				}
 		 ;
 		
-decision: IF P_A condicion P_C { if_guardar_salto(crearTerceto_ccc(valor_comparacion, "", "")); }
+decision: IF P_A condicion P_C { if(strcmp(valor_comparacion, "") != 0) if_guardar_salto(crearTerceto_ccc(valor_comparacion, "", "")); else if_index++; }
 			 decision_bloque
 		;
 
 decision_bloque: 
-		  bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
+		  bloque ENDIF { 
+			if_completar_ultimo_salto_guardado_con(terceto_index);
+			completar_salto_si_es_comparacion_AND(terceto_index); 
+			completar_salto_si_es_inlist_negado(terceto_index);
+			}
 		| bloque { if_completar_ultimo_salto_guardado_con(terceto_index+1);
-			       if_guardar_salto(crearTerceto_ccc("BI", "","")); } 
-		  ELSE bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
+			       completar_salto_si_es_comparacion_AND(terceto_index+1);
+				   if_guardar_salto(crearTerceto_ccc("BI", "","")); 
+				   completar_salto_si_es_inlist_negado(terceto_index);
+				} 
+		  ELSE bloque ENDIF { printf("completando ult salto con %d \n", terceto_index); if_completar_ultimo_salto_guardado_con(terceto_index); }
 		;
 
-condicion: comparacion
-         | comparacion AND comparacion 
-		 | comparacion OR comparacion
-		 | NOT comparacion
-		 | NOT P_A comparacion P_C
+condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; guardar_condicion_no_tiene_inlist_negado(); }
+         | comparacion { and_index++; saltos_and_a_completar[and_index] = crearTerceto_ccc(valor_comparacion, "", "");  guardar_condicion_no_tiene_inlist_negado(); } AND comparacion 
+		 | comparacion { 
+				and_index++; saltos_and_a_completar[and_index] = -1; 
+				crearTerceto_cic(valor_comparacion, terceto_index+2, ""); // salto a la prox comparación
+				pos_a_completar_OR = crearTerceto_ccc("BI","",""); // tengo que saltar al final de la prox comparacion
+				guardar_condicion_no_tiene_inlist_negado();
+				} 
+			OR comparacion {
+				char *salto = (char*) malloc(sizeof(int)); 
+				itoa(terceto_index+1, salto, 10); 
+				tercetos[pos_a_completar_OR].dos = (char*) malloc(sizeof(char)*strlen(salto));
+				strcpy(tercetos[pos_a_completar_OR].dos, salto);
+			}
+		 | NOT { guardar_condicion_no_tiene_inlist_negado(); es_negado = 1; } condicion_negada;
 		 ;
 
-comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BGE"); }
-		   | expresion { IndComparacion = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BGT"); }
-		   | expresion { IndComparacion = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BLE"); }
-		   | expresion { IndComparacion = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BLT"); }
-		   | expresion { IndComparacion = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BNE"); }
-		   | expresion { IndComparacion = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", IndComparacion, IndExpresion); strcpy(valor_comparacion, "BEQ"); }
-		   | inlist    { strcpy(valor_comparacion, "BI"); /* si llego hasta acá es que no encontré coincidencia */ }
+condicion_negada: comparacion { es_negado = 0; }
+			|  P_A comparacion P_C { es_negado = 0; }
+		;
+
+comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+				if(es_negado == 0) { strcpy(valor_comparacion, "BGE"); } else { strcpy(valor_comparacion, "BLT"); }
+			 }
+		   | expresion { IndComparacion = IndExpresion; } MENOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+				if(es_negado == 0) { strcpy(valor_comparacion, "BGT"); } else { strcpy(valor_comparacion, "BLE"); } 
+			 }
+		   | expresion { IndComparacion = IndExpresion; } MAYOR expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BLE"); } else { strcpy(valor_comparacion, "BGT"); } 
+			 } 
+		   | expresion { IndComparacion = IndExpresion; } MAYOR_IGUAL expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BLT"); } else { strcpy(valor_comparacion, "BGE"); }
+			 } 
+		   | expresion { IndComparacion = IndExpresion; } IGUAL expresion       { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BNE"); } else { strcpy(valor_comparacion, "BEQ"); }
+			 } 
+		   | expresion { IndComparacion = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", IndComparacion, IndExpresion); 
+		   		if(es_negado == 0) { strcpy(valor_comparacion, "BEQ"); } else { strcpy(valor_comparacion, "BNE"); }
+			 } 
+		   | inlist { if (es_negado == 0) { strcpy(valor_comparacion, "BI"); } else { strcpy(valor_comparacion, ""); inlist_negados[index_inlist_negados].tiene_inlist_negado = 1; printf("cond nro %d tiene inlist negado\n", index_inlist_negados);} }
 		   ; 
 
 average: AVG P_A C_A avg_expresiones C_C P_C
@@ -183,11 +235,13 @@ avg_expresiones: expresion
 inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", ""); } COMA 
 		C_A inlist_expresiones C_C P_C  {   
 											// aca completo los saltos por la pos actual de tercetos +1 (por el BI)
-											int i;
-											for (i=0; i<inlist_cant_saltos; i++) {
-												char *salto = (char*) malloc(sizeof(int));
-												itoa(terceto_index+1, salto, 10);
-												tercetos[inlist_saltos_a_completar[i]].dos = salto;
+											if (es_negado == 0) {
+												int i;
+												for (i=0; i<inlist_cant_saltos; i++) {
+													char *salto = (char*) malloc(sizeof(int));
+													itoa(terceto_index+1, salto, 10);
+													tercetos[inlist_saltos_a_completar[i]].dos = salto;
+												}
 											}
 										}
 	  ;
@@ -195,14 +249,26 @@ inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3
 inlist_expresiones: expresion { 
 								inlist_cant_saltos = 0;
 								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
-								inlist_saltos_a_completar[inlist_cant_saltos] = crearTerceto_ccc("BEQ", "", "");  
+								int pos;
+								pos = crearTerceto_ccc("BEQ", "", "");  
+								inlist_saltos_a_completar[inlist_cant_saltos] = pos;
 								inlist_cant_saltos++;
+								if (es_negado == 1) {
+									inlist_negados[index_inlist_negados].cantidad_saltos = inlist_cant_saltos;
+									inlist_negados[index_inlist_negados].posiciones[inlist_cant_saltos-1] = pos;	
+								}
+								
 								}
 		          | inlist_expresiones PUNTO_COMA expresion {
 								IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
-								inlist_saltos_a_completar[inlist_cant_saltos] = crearTerceto_ccc("BEQ", "", "");  
+								int pos = crearTerceto_ccc("BEQ", "", "");
+								inlist_saltos_a_completar[inlist_cant_saltos] = pos;  
 								inlist_cant_saltos++;
+								if (es_negado == 1) {
+									inlist_negados[index_inlist_negados].cantidad_saltos = inlist_cant_saltos;
+									inlist_negados[index_inlist_negados].posiciones[inlist_cant_saltos-1] = pos;	
 								}
+				  				}
 		          ;
 		  
 expresion: expresion OP_SUMA termino  { IndExpresion = crearTerceto_cii("+", IndExpresion, IndTermino); }
@@ -358,7 +424,6 @@ void if_completar_ultimo_salto_guardado_con(int pos) {
 	tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
 	strcpy(tercetos[if_saltos[if_index]].dos, salto);
 	if_index--;
-	
 }
 
 /* Funcion para simil apilar las pos del while */
@@ -373,4 +438,45 @@ void while_guardar_pos(int pos) {
 		yyerror("No se puede tener más de 5 whiles anidados");
 	}
 }
+
+/* Si el flag de AND esta prendido completa la pos guardada y vuelve el flag a off */
+void completar_salto_si_es_comparacion_AND(int pos) {
+		if (saltos_and_a_completar[and_index] == -1){
+			and_index--; // flags usados para mantener la correlatividad de la pila de if con la de and
+		}
+		else {
+			char *salto = (char*) malloc(sizeof(int)); 
+			itoa(pos, salto, 10); 
+			tercetos[saltos_and_a_completar[and_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
+			strcpy(tercetos[saltos_and_a_completar[and_index]].dos, salto);
+			and_index--;
+		}
 	
+}
+
+/* Funcion auxiliar para completar caso particular del inlist */
+void completar_salto_si_es_inlist_negado(int pos) {
+	printf("Tiene negado --> %d ; cantidad %d ; if nro %d \n ", inlist_negados[index_inlist_negados].tiene_inlist_negado, inlist_negados[index_inlist_negados].cantidad_saltos, index_inlist_negados);
+	if (inlist_negados[index_inlist_negados].tiene_inlist_negado != -1) {
+		int i;
+		for (i=0; i < inlist_negados[index_inlist_negados].cantidad_saltos; i++) {
+			char *salto = (char*) malloc(sizeof(int));
+			itoa(terceto_index, salto, 10);
+			printf("Completando pos %d\n", inlist_negados[index_inlist_negados].posiciones[i]);
+			tercetos[inlist_negados[index_inlist_negados].posiciones[i]].dos = salto;
+		}
+		index_inlist_negados--; 
+	}
+	else { 
+		index_inlist_negados--; 
+	}
+}
+
+void guardar_condicion_no_tiene_inlist_negado () {
+	struct cond_inlist_negado cond;
+	cond.tiene_inlist_negado = -1;
+	cond.cantidad_saltos = 0;
+	
+	index_inlist_negados++;
+	inlist_negados[index_inlist_negados] = cond;
+}
