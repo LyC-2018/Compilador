@@ -53,6 +53,10 @@ int inlist_cant_saltos;
 /**** INICIO COMPARACION ****/
 char valor_comparacion[3];
 int IndComparacion;
+int saltos_and_a_completar[6];
+int and_index = 0;
+void completar_salto_si_es_comparacion_AND(int pos);
+int pos_a_completar_OR;
 /**** FIN COMPARACION ****/
 
 /**** INICIO IF ****/
@@ -143,6 +147,7 @@ iteracion: WHILE P_A { while_guardar_pos(terceto_index); }
 				while_index--; 
 				crearTerceto_cic("BI", while_pos_a_completar[while_index], "");
 				while_index--; 
+				completar_salto_si_es_comparacion_AND(terceto_index);
 				}
 		 ;
 		
@@ -151,15 +156,29 @@ decision: IF P_A condicion P_C { if_guardar_salto(crearTerceto_ccc(valor_compara
 		;
 
 decision_bloque: 
-		  bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
+		  bloque ENDIF { 
+			if_completar_ultimo_salto_guardado_con(terceto_index);
+			completar_salto_si_es_comparacion_AND(terceto_index); 
+			}
 		| bloque { if_completar_ultimo_salto_guardado_con(terceto_index+1);
-			       if_guardar_salto(crearTerceto_ccc("BI", "","")); } 
+			       completar_salto_si_es_comparacion_AND(terceto_index+1);
+				   if_guardar_salto(crearTerceto_ccc("BI", "","")); } 
 		  ELSE bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
 		;
 
-condicion: comparacion
-         | comparacion AND comparacion 
-		 | comparacion OR comparacion
+condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; }
+         | comparacion { and_index++; saltos_and_a_completar[and_index] = crearTerceto_ccc(valor_comparacion, "", ""); } AND comparacion 
+		 | comparacion { 
+				and_index++; saltos_and_a_completar[and_index] = -1; 
+				crearTerceto_cic(valor_comparacion, terceto_index+2, ""); // salto a la prox comparación
+				pos_a_completar_OR = crearTerceto_ccc("BI","",""); // tengo que saltar al final de la prox comparacion
+				} 
+			OR comparacion {
+				char *salto = (char*) malloc(sizeof(int)); 
+				itoa(terceto_index+1, salto, 10); 
+				tercetos[pos_a_completar_OR].dos = (char*) malloc(sizeof(char)*strlen(salto));
+				strcpy(tercetos[pos_a_completar_OR].dos, salto);
+			}
 		 | NOT comparacion
 		 | NOT P_A comparacion P_C
 		 ;
@@ -373,4 +392,18 @@ void while_guardar_pos(int pos) {
 		yyerror("No se puede tener más de 5 whiles anidados");
 	}
 }
+
+/* Si el flag de AND esta prendido completa la pos guardada y vuelve el flag a off */
+void completar_salto_si_es_comparacion_AND(int pos) {
+		if (saltos_and_a_completar[and_index] == -1){
+			and_index--; // flags usados para mantener la correlatividad de la pila de if con la de and
+		}
+		else {
+			char *salto = (char*) malloc(sizeof(int)); 
+			itoa(pos, salto, 10); 
+			tercetos[saltos_and_a_completar[and_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
+			strcpy(tercetos[saltos_and_a_completar[and_index]].dos, salto);
+			and_index--;
+		}
 	
+}
