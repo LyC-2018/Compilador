@@ -57,6 +57,8 @@ int IndComparacion;
 
 /**** INICIO IF ****/
 int if_salto_a_completar;
+int if_saltos[5];
+int if_index = 0;
 /**** FIN IF ****/
 
 /**** INICIO WHILE ****/
@@ -131,13 +133,32 @@ iteracion: WHILE P_A { while_pos_inicio = terceto_index; } condicion P_C { while
 			bloque ENDWHILE { crearTerceto_cic("BI", while_pos_inicio, ""); char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[while_salto_a_completar].dos = salto; }
 		 ;
 		
-decision: IF P_A condicion P_C { if_salto_a_completar = crearTerceto_ccc(valor_comparacion, "", ""); } 
+decision: IF P_A condicion P_C { if_index++; if_saltos[if_index] = crearTerceto_ccc(valor_comparacion, "", ""); }
 			 decision_bloque
 		;
 
 decision_bloque: 
-		  bloque ENDIF { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[if_salto_a_completar].dos = salto; }
-		| bloque { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index+1, salto, 10); tercetos[if_salto_a_completar].dos = salto; if_salto_a_completar = crearTerceto_ccc("BI", "",""); } ELSE bloque ENDIF { char *salto = (char*) malloc(sizeof(int)); itoa(terceto_index, salto, 10); tercetos[if_salto_a_completar].dos = salto; }
+		  bloque ENDIF { 
+			char *salto = (char*) malloc(sizeof(int)); 
+			itoa(terceto_index, salto, 10); 
+			tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
+			strcpy(tercetos[if_saltos[if_index]].dos, salto);
+			if_index--;
+			}
+		| bloque { 
+			char *salto = (char*) malloc(sizeof(int)); 
+			itoa(terceto_index+1, salto, 10); 
+			tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
+			strcpy(tercetos[if_saltos[if_index]].dos, salto);
+			if_index--;
+			if_index++; if_saltos[if_index] = crearTerceto_ccc("BI", "",""); } 
+		  ELSE bloque ENDIF { 
+			char *salto = (char*) malloc(sizeof(int)); 
+			itoa(terceto_index, salto, 10); 
+			tercetos[if_saltos[if_index]].dos = (char*) malloc(sizeof(char)*strlen(salto));
+			strcpy(tercetos[if_saltos[if_index]].dos, salto);
+			if_index--;
+			}
 		;
 
 condicion: comparacion
