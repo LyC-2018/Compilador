@@ -24,6 +24,8 @@ int IndExpresion;
 int IndTermino;
 int IndFactor;
 int IndInlist;
+int IndEntrada;
+int IndSalida;
 
 struct terceto {
 	char *uno;
@@ -227,8 +229,7 @@ condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; gu
 		 ;
 
 condicion_negada: comparacion { es_negado = 0; }
-			|  P_A comparacion P_C { es_negado = 0; }
-		;
+		        ;
 
 comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion { crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 				if(es_negado == 0) { strcpy(valor_comparacion, "BGE"); } else { strcpy(valor_comparacion, "BLT"); }
@@ -348,10 +349,15 @@ constante: CTE_INT    { IndFactor = crearTerceto_icc($1, "", ""); }
 		 | CTE_REAL   { IndFactor = crearTerceto_fcc($1, "", ""); }
 		 ;
 
-entrada: READ ID
+entrada: READ ID			{ existe_en_ts($2);
+							  IndEntrada = crearTerceto_ccc($2, "", ""); 
+							  crearTerceto_cic("READ",IndEntrada,"");
+							}
        ;
 
-salida: WRITE CTE_STRING
+salida: WRITE CTE_STRING	{ IndSalida = crearTerceto_ccc($2, "", "");
+							  crearTerceto_cic("WRITE",IndSalida,"");
+							}
       | WRITE ID 			{ existe_en_ts($2); }
 	  ;
 
