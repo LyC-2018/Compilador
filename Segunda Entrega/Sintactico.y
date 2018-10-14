@@ -457,7 +457,7 @@ void save_tercetos() {
 	{
 		int i = 0;
 		for (i;i<terceto_index;i++) {
-			printf("%d (%s, %s, %s)\n", i, tercetos[i].uno, tercetos[i].dos, tercetos[i].tres);
+			// printf("%d (%s, %s, %s)\n", i, tercetos[i].uno, tercetos[i].dos, tercetos[i].tres);
 			fprintf(file, "%d (%s, %s, %s)\n", i, tercetos[i].uno, tercetos[i].dos, tercetos[i].tres);
 		}
 		fclose(file);
@@ -521,7 +521,6 @@ void completar_salto_si_es_inlist_negado(int pos) {
 		for (i=0; i < inlist_negados[index_inlist_negados].cantidad_saltos; i++) {
 			char *salto = (char*) malloc(sizeof(int));
 			itoa(terceto_index, salto, 10);
-			printf("Completando pos %d\n", inlist_negados[index_inlist_negados].posiciones[i]);
 			tercetos[inlist_negados[index_inlist_negados].posiciones[i]].dos = salto;
 		}
 		index_inlist_negados--;
