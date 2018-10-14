@@ -206,7 +206,7 @@ decision_bloque:
 				   if_guardar_salto(crearTerceto_ccc("BI", "",""));
 				   completar_salto_si_es_inlist_negado(terceto_index);
 				}
-		  ELSE bloque ENDIF { printf("completando ult salto con %d \n", terceto_index); if_completar_ultimo_salto_guardado_con(terceto_index); }
+		  ELSE bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
 		;
 
 condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; guardar_condicion_no_tiene_inlist_negado(); }
@@ -248,7 +248,7 @@ comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion { crea
 		   | expresion { IndComparacion = IndExpresion; } DISTINTO expresion    { crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 		   		if(es_negado == 0) { strcpy(valor_comparacion, "BEQ"); } else { strcpy(valor_comparacion, "BNE"); }
 			 }
-		   | inlist { if (es_negado == 0) { strcpy(valor_comparacion, "BI"); } else { strcpy(valor_comparacion, ""); inlist_negados[index_inlist_negados].tiene_inlist_negado = 1; printf("cond nro %d tiene inlist negado\n", index_inlist_negados);} }
+		   | inlist { if (es_negado == 0) { strcpy(valor_comparacion, "BI"); } else { strcpy(valor_comparacion, ""); inlist_negados[index_inlist_negados].tiene_inlist_negado = 1; } }
 		   ;
 
 average: AVG P_A C_A avg_expresiones C_C P_C { if(cantExpAvg == 1){
@@ -516,7 +516,6 @@ void completar_salto_si_es_comparacion_AND(int pos) {
 
 /* Funcion auxiliar para completar caso particular del inlist */
 void completar_salto_si_es_inlist_negado(int pos) {
-	printf("Tiene negado --> %d ; cantidad %d ; if nro %d \n ", inlist_negados[index_inlist_negados].tiene_inlist_negado, inlist_negados[index_inlist_negados].cantidad_saltos, index_inlist_negados);
 	if (inlist_negados[index_inlist_negados].tiene_inlist_negado != -1) {
 		int i;
 		for (i=0; i < inlist_negados[index_inlist_negados].cantidad_saltos; i++) {
