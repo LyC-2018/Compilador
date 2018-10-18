@@ -1,6 +1,6 @@
 -/ bloque de declaracion /-     
 DECVAR         
- a,b : INT
+ a,b,z : INT
  c : FLOAT
  d,e : STRING
 ENDDEC
@@ -13,12 +13,12 @@ WHILE (AVG([2.3]) == 2.3 OR 1==1)
 ENDWHILE
 
 IF (((2 * 1) - 1) == 1 )
-    a = AVG([2,a+b,c])
+    c = AVG([2,a+b,c])
 ENDIF
 
-WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34+d) ; 48]) AND b == 1)
+WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34) ; 48]) AND b == 1)
     a = 1
-    IF (C == 10)
+    IF (z == 10)
         a = a + 1
     ENDIF
 ENDWHILE
