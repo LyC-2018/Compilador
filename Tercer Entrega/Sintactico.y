@@ -302,8 +302,12 @@ avg_expresiones: { // pone todo en la pila antes de entrar al average para que n
                                                    }
 			   ;
 
-inlist: INLIST P_A ID { existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", ""); } COMA
-		C_A inlist_expresiones C_C P_C  {	
+inlist: INLIST P_A ID { 
+						int tipo = buscarTipoTS($3);
+						verificarTipoDato(tipo);
+						existe_en_ts($3); inlist_indice_id = crearTerceto_ccc($3, "", "");
+					  } 
+		COMA C_A inlist_expresiones C_C P_C  {	
 											reiniciarTipoDato();
 											// aca completo los saltos por la pos actual de tercetos +1 (por el BI)
 											if (es_negado == 0) {
