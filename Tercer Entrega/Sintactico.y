@@ -440,11 +440,11 @@ void reinicioVariables() {
 int crearTerceto_ccc(char *uno, char *dos, char *tres) {
 	struct terceto terc;
 	int index = terceto_index;
-	terc.uno = malloc(sizeof(char)*strlen(uno));
+	terc.uno = malloc(sizeof(char)*strlen(uno)+1);
 	strcpy(terc.uno, uno);
-	terc.dos = malloc(sizeof(char)*strlen(dos));
+	terc.dos = malloc(sizeof(char)*strlen(dos)+1);
 	strcpy(terc.dos, dos);
-	terc.tres = malloc(sizeof(char)*strlen(tres));
+	terc.tres = malloc(sizeof(char)*strlen(tres)+1);
 	strcpy(terc.tres, tres);
 	tercetos[index] = terc;
 	terceto_index++;
