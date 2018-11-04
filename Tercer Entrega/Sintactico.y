@@ -133,6 +133,7 @@ int String = 3;
 /**** Inicio assembler ****/
 void genera_asm();
 void generaSegmDatosAsm(FILE*);
+char* getNombreAsm(char *cte_o_id);
 char* getCodOp(char*);
 /**** Fin assembler ****/
 %}
@@ -401,7 +402,10 @@ entrada: READ ID			{ existe_en_ts($2);
 salida: WRITE CTE_STRING	{ IndSalida = crearTerceto_ccc($2, "", "");
 							  crearTerceto_cic("WRITE",IndSalida,"");
 							}
-      | WRITE ID 			{ existe_en_ts($2); }
+      | WRITE ID 			{ existe_en_ts($2); 
+	  						  IndSalida = crearTerceto_ccc($2, "", "");
+							  crearTerceto_cic("WRITE",IndSalida,""); 
+							}
 	  ;
 
 %%
@@ -591,9 +595,25 @@ void guardar_condicion_no_tiene_inlist_negado () {
 int buscarTipoTS(char* nombreVar) {
 
 	int pos = nombre_existe_en_ts(nombreVar);
-	
 	if (pos == -1) {
-		yyerror("La variable no fue declarada");
+		
+		char *nomCte = (char*) malloc(31*sizeof(char));
+		*nomCte = '\0';
+		strcat(nomCte, nombreVar);
+	
+		char *original = nomCte;
+		while(*nomCte != '\0') {
+			if (*nomCte == ' ' || *nomCte == '"') {
+				*nomCte = '_';
+			}
+			nomCte++;
+		}
+		nomCte = original;
+
+		int pos = nombre_existe_en_ts(nomCte);
+		if (pos == -1) {
+			yyerror("La variable no fue declarada");
+		}
 	}
 	
 	return tipoDeDato(pos);
@@ -705,6 +725,24 @@ void genera_asm()
 		} 
 		else if (opUnaria == 1) {
 			// Saltos, write, read
+			
+			if (strcmp("WRITE", tercetos[i].uno) == 0) 
+			{	
+				int tipo = buscarTipoTS(tercetos[atoi(tercetos[i].dos)].uno);
+				if (tipo == Float) 
+				{
+					fprintf(pf_asm, "\t DisplayFloat %s,2 \n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+				}
+				else if (tipo == Integer) 
+				{
+					fprintf(pf_asm, "\t DisplayInteger %s \n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+				} else 
+				{
+					fprintf(pf_asm, "\t DisplayString %s \n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+				}
+				// Siempre inserto nueva linea despues de mostrar msj
+				fprintf(pf_asm, "\t newLine \n");
+			}
 		}
 		else {
 			// Expresiones ; Comparaciones
@@ -731,7 +769,6 @@ void generaSegmDatosAsm(FILE* pf_asm)
 	fprintf(pf_asm, "\n.DATA \n");
 
 
-	fprintf(pf_asm, "\t_NEWLINE 	db 	0Dh,0Ah,'$'\t;salto de linea\n");
 	/*for(i=0; i<getCountTS(); i++)
 	{
 
@@ -810,3 +847,32 @@ char* getCodOp(char* token)
 	}
 }
 
+/*
+	Obtiene los nombres para assembler
+*/
+char* getNombreAsm(char *cte_o_id) {
+	char nombreAsm[200];
+	nombreAsm[0] = '\0';
+	strcat(nombreAsm, "@"); // prefijo agregado
+	
+	int pos = nombre_existe_en_ts(cte_o_id);
+	if (pos==-1) { //si no lo encuentro con el mismo nombre es porque debe ser cte		
+		char *nomCte = (char*) malloc(31*sizeof(char));
+		*nomCte = '\0';
+		strcat(nomCte, cte_o_id);
+	
+		char *original = nomCte;
+		while(*nomCte != '\0') {
+			if (*nomCte == ' ' || *nomCte == '"') {
+				*nomCte = '_';
+			}
+			nomCte++;
+		}
+		nomCte = original;
+		strcat(nombreAsm, nomCte);
+	} else {
+		strcat(nombreAsm, cte_o_id);
+	}
+	
+	return nombreAsm;
+}

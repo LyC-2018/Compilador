@@ -187,8 +187,16 @@ int insertar_ctestring_en_ts(char *str)
 {
 	char *nombre = (char*) malloc(31*sizeof(char));
 	*nombre = '\0';
-	strcat(nombre, "_");
 	strcat(nombre, str);
+	
+	char *original = nombre;
+	while(*nombre != '\0') {
+		if (*nombre == ' ' || *nombre == '"') {
+			*nombre = '_';
+		}
+		nombre++;
+	}
+	nombre = original;
 	
 	char *longitud = (char*) malloc(10*sizeof(char));	
 	itoa(strlen(str), longitud, 10);
