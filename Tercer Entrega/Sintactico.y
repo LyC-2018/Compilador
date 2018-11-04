@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <string.h>
 #include "y.tab.h"
+#include "assembler.h"
 
 FILE *yyin;
 char *yytext;
@@ -154,7 +155,7 @@ char *strVal;
 
 %%
 
-start: programa { printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
+start: programa { genera_asm(); printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
 	 |			{ printf("\n El archivo 'Prueba.Txt' no tiene un programa\n"); }
 	 ;
 
