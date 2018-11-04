@@ -680,7 +680,36 @@ void genera_asm()
     fprintf(pf_asm, "\t FNINIT \n");;
     fprintf(pf_asm, "\n");
 
+	int i;
+	int opSimple,  // Formato terceto (x,  ,  ) 
+		opUnaria,  // Formato terceto (x, x,  )
+		opBinaria; // Formato terceto (x, x, x)
+	for (i = 0; i < terceto_index; i++) 
+	{
+		if (strcmp("", tercetos[i].dos) == 0) {
+			opSimple = 1;
+			opUnaria = 0;
+			opBinaria = 0;
+		} else if (strcmp("", tercetos[i].tres) == 0) {
+			opSimple = 0;
+			opUnaria = 1;
+			opBinaria = 0;
+		} else {
+			opSimple = 0; 
+			opUnaria = 0;
+			opBinaria = 1;
+		}
 
+		if (opSimple == 1) {
+			// Ids, constantes
+		} 
+		else if (opUnaria == 1) {
+			// Saltos, write, read
+		}
+		else {
+			// Expresiones ; Comparaciones
+		}
+	}
 
 	/*generamos el final */
 	fprintf(pf_asm, "\t mov AX, 4C00h \t ; Genera la interrupcion 21h\n");
