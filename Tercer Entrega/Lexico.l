@@ -39,6 +39,7 @@ void mensaje_error();
 int nombre_existe_en_ts(char *id);
 void existe_en_ts(char *id);
 void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longitud);
+void insertar_ts_si_no_existe(char *nombre, char *tipo, char *valor, char *longitud);
 void save_reg_ts();
 void mostrar_ts();
 void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual[]);
@@ -189,6 +190,7 @@ int insertar_ctestring_en_ts(char *str)
 {
 	char *nombre = (char*) malloc(31*sizeof(char));
 	*nombre = '\0';
+	strcat(nombre, "_");
 	strcat(nombre, str);
 	
 	char *original = nombre;
@@ -299,6 +301,15 @@ void insertar_tabla_simbolos(char *nombre, char *tipo, char *valor, char *longit
 	
 	tabla_simbolos[cant_reg] = reg;
 	cant_reg++;
+}
+
+void insertar_ts_si_no_existe(char *nombre, char *tipo, char *valor, char *longitud) {
+	char* aux = (char*) malloc(10*sizeof(char));
+	*aux='\0';
+	strcpy(aux, nombre);
+	if(nombre_existe_en_ts(aux)==-1) {
+		insertar_tabla_simbolos(aux,tipo,valor,longitud);
+	}
 }
 
 void save_reg_ts()

@@ -131,6 +131,9 @@ int String = 3;
 /**** FIN EXP NUMERICA ****/
 
 /**** Inicio assembler ****/
+char lista_operandos_assembler[100][100];
+int cant_op = 0;
+
 void genera_asm();
 char* getNombreAsm(char *cte_o_id);
 char* getCodOp(char*);
@@ -598,6 +601,7 @@ int buscarTipoTS(char* nombreVar) {
 		
 		char *nomCte = (char*) malloc(31*sizeof(char));
 		*nomCte = '\0';
+		strcat(nomCte, "_");
 		strcat(nomCte, nombreVar);
 	
 		char *original = nomCte;
@@ -674,12 +678,13 @@ void genera_asm()
 	int cont=0;
 	char* file_asm = "Final.asm";
 	FILE* pf_asm;
+	char aux[10];
 	
-	 if((pf_asm = fopen(file_asm, "w")) == NULL)
-     {
-               printf("Error al generar el asembler \n");
-               exit(1);
-     }
+	if((pf_asm = fopen(file_asm, "w")) == NULL)
+	{
+		printf("Error al generar el asembler \n");
+		exit(1);
+	}
 	 /* generamos el principio del assembler, que siempre es igual */
 
 	 fprintf(pf_asm, "include macros2.asm\n");
@@ -688,9 +693,6 @@ void genera_asm()
 	 fprintf(pf_asm, ".386\n");
 	 fprintf(pf_asm, ".STACK 200h \n");
 
-	 generaSegmDatosAsm(pf_asm);
-
-	 fprintf(pf_asm, "\n");
 	 fprintf(pf_asm, ".CODE \n");
 	 fprintf(pf_asm, "MAIN:\n");
 	 fprintf(pf_asm, "\n");
@@ -724,6 +726,8 @@ void genera_asm()
 
 		if (opSimple == 1) {
 			// Ids, constantes
+			cant_op++;
+			strcpy(lista_operandos_assembler[cant_op], tercetos[i].uno);
 		} 
 		else if (opUnaria == 1) {
 			// Saltos, write, read
@@ -737,7 +741,7 @@ void genera_asm()
 				}
 				else if (tipo == Integer) 
 				{
-					fprintf(pf_asm, "\t DisplayInteger %s \n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+					fprintf(pf_asm, "\t DisplayFloat %s,2 \n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
 				} else 
 				{
 					fprintf(pf_asm, "\t DisplayString %s \n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
@@ -754,23 +758,62 @@ void genera_asm()
 				} 
 				else if (tipo == Integer) 
 				{
-					fprintf(pf_asm, "\t GetInteger %s\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+					// pongo getfloat para manejar todo con fld en las operaciones
+					fprintf(pf_asm, "\t GetFloat %s\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
 				}	
 				else 
 				{
 					fprintf(pf_asm, "\t GetString %s\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
 				}
 			}
+			else // saltos
+			{
+				char *codigo = getCodOp(tercetos[i].uno);
+				printf("Codigo conseguido %s \n", codigo);
+				//crearEtiqueta(tercetos[i].dos);
+			}
  		}
 		else {
-			// Expresiones ; Comparaciones
+			// Expresiones ; Comparaciones ; Asignacion
+			char *op1 = lista_operandos_assembler[cant_op];
+			cant_op--;
+			char *op2 =  lista_operandos_assembler[cant_op];
+			cant_op--;
+			printf("Uso %s y %s\n", op1, op2);
+
+			if (strcmp(tercetos[i].uno, "=" ) == 0)
+			{
+				fprintf(pf_asm, "\t FLD %s \t;Cargo valor \n", getNombreAsm(op2));
+				fprintf(pf_asm, "\t FSTP %s \t; Se lo asigno a la variable que va a guardar el resultado \n", getNombreAsm(op1));
+			}
+			else
+			{
+				// si es resta o division, intercambiar
+
+				printf("Terceto (%s, %s, %s)\n", tercetos[i].uno, tercetos[i].dos, tercetos[i].tres);
+				sprintf(aux, "_aux%d", i); // auxiliar relacionado al terceto
+				insertar_ts_si_no_existe(aux, "REAL", "", "");
+				fflush(pf_asm);
+				fprintf(pf_asm, "\t FLD %s \t;Cargo operando 1\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+				fprintf(pf_asm, "\t FLD %s \t;Cargo operando 2\n", getNombreAsm(tercetos[atoi(tercetos[i].tres)].uno));
+				fflush(pf_asm);
+
+				fprintf(pf_asm, "\t %s \t\t;Opero\n", getCodOp(tercetos[i].uno));
+				fprintf(pf_asm, "\t FSTP %s \t;Almaceno el resultado en una var auxiliar\n", getNombreAsm(aux));
+				
+				cant_op++;
+				strcpy(lista_operandos_assembler[cant_op], aux);
+			}
+			
 		}
 	}
+
 
 	/*generamos el final */
 	fprintf(pf_asm, "\t mov AX, 4C00h \t ; Genera la interrupcion 21h\n");
 	fprintf(pf_asm, "\t int 21h \t ; Genera la interrupcion 21h\n");
-	
+
+	generaSegmDatosAsm(pf_asm);
 
 	fprintf(pf_asm, "END MAIN\n");
 	fclose(pf_asm);
@@ -842,6 +885,7 @@ char* getNombreAsm(char *cte_o_id) {
 	if (pos==-1) { //si no lo encuentro con el mismo nombre es porque debe ser cte		
 		char *nomCte = (char*) malloc(31*sizeof(char));
 		*nomCte = '\0';
+		strcat(nomCte, "_");
 		strcat(nomCte, cte_o_id);
 	
 		char *original = nomCte;
