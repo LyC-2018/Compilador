@@ -712,8 +712,25 @@ void genera_asm()
 	int opSimple,  // Formato terceto (x,  ,  ) 
 		opUnaria,  // Formato terceto (x, x,  )
 		opBinaria; // Formato terceto (x, x, x)
+	
+	// Guardo todos los tercetos donde tendría que poner etiquetas
+	for(i = 0; i < terceto_index; i++)
+	{
+		if (strcmp(tercetos[i].dos, "") != 0 && strcmp(tercetos[i].tres, "") ==0)
+		{
+			if (strcmp(tercetos[i].uno, "READ") != 0 && strcmp(tercetos[i].uno, "WRITE") != 0)
+			{
+				cant_etiquetas++;
+				lista_etiquetas[cant_etiquetas] = atoi(tercetos[i].dos);
+			}
+		}	
+	}
+	
+	// Armo el assembler
 	for (i = 0; i < terceto_index; i++) 
 	{
+		//printf("TERCETO NUMERO %d \n", i);
+
 		if (strcmp("", tercetos[i].dos) == 0) {
 			opSimple = 1;
 			opUnaria = 0;
@@ -782,8 +799,6 @@ void genera_asm()
 			else // saltos
 			{
 				char *codigo = getCodOp(tercetos[i].uno);
-				cant_etiquetas++;
-				lista_etiquetas[cant_etiquetas] = atoi(tercetos[i].dos); 
 				sprintf(etiqueta_aux, "ETIQ_%d", atoi(tercetos[i].dos));
 				fflush(pf_asm); 
 				fprintf(pf_asm, "\t %s %s \t;Si cumple la condicion salto a la etiqueta\n", codigo, etiqueta_aux);
@@ -865,7 +880,7 @@ char* getCodOp(char* token)
 	{
 		return "FDIV";
 	}
-	else if(!strcmp(token, "BNE")) // revisar los saltos
+	else if(!strcmp(token, "BNE"))
 	{
 		return "JNE";
 	}
@@ -873,21 +888,21 @@ char* getCodOp(char* token)
 	{
 		return "JE";
 	}
-	else if(!strcmp(token, "BBE"))
-	{
-		return "JAE";
-	}
-	else if(!strcmp(token, "BBT"))
+	else if(!strcmp(token, "BGE"))
 	{
 		return "JNA";
 	}
+	else if(!strcmp(token, "BGT"))
+	{
+		return "JNAE";
+	}
 	else if(!strcmp(token, "BLE"))
 	{
-		return "JBE";
+		return "JNB";
 	}
 	else if(!strcmp(token, "BLT"))
 	{
-		return "JNB";
+		return "JNBE";
 	}
 	else if (!strcmp(token, "BI")) {
 		return "JMP";
