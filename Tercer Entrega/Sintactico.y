@@ -775,27 +775,24 @@ void genera_asm()
  		}
 		else {
 			// Expresiones ; Comparaciones ; Asignacion
-			char *op1 = lista_operandos_assembler[cant_op];
+			char *op2 = lista_operandos_assembler[cant_op];
 			cant_op--;
-			char *op2 =  lista_operandos_assembler[cant_op];
+			char *op1 =  lista_operandos_assembler[cant_op];
 			cant_op--;
 			printf("Uso %s y %s\n", op1, op2);
 
 			if (strcmp(tercetos[i].uno, "=" ) == 0)
 			{
-				fprintf(pf_asm, "\t FLD %s \t;Cargo valor \n", getNombreAsm(op2));
-				fprintf(pf_asm, "\t FSTP %s \t; Se lo asigno a la variable que va a guardar el resultado \n", getNombreAsm(op1));
+				fprintf(pf_asm, "\t FLD %s \t;Cargo valor \n", getNombreAsm(op1));
+				fprintf(pf_asm, "\t FSTP %s \t; Se lo asigno a la variable que va a guardar el resultado \n", getNombreAsm(op2));
 			}
 			else
 			{
-				// si es resta o division, intercambiar
-
-				printf("Terceto (%s, %s, %s)\n", tercetos[i].uno, tercetos[i].dos, tercetos[i].tres);
 				sprintf(aux, "_aux%d", i); // auxiliar relacionado al terceto
 				insertar_ts_si_no_existe(aux, "REAL", "", "");
 				fflush(pf_asm);
-				fprintf(pf_asm, "\t FLD %s \t;Cargo operando 1\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
-				fprintf(pf_asm, "\t FLD %s \t;Cargo operando 2\n", getNombreAsm(tercetos[atoi(tercetos[i].tres)].uno));
+				fprintf(pf_asm, "\t FLD %s \t;Cargo operando 1\n", getNombreAsm(op1));
+				fprintf(pf_asm, "\t FLD %s \t;Cargo operando 2\n", getNombreAsm(op2));
 				fflush(pf_asm);
 
 				fprintf(pf_asm, "\t %s \t\t;Opero\n", getCodOp(tercetos[i].uno));
