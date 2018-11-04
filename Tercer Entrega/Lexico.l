@@ -195,7 +195,8 @@ int insertar_ctestring_en_ts(char *str)
 	
 	char *original = nombre;
 	while(*nombre != '\0') {
-		if (*nombre == ' ' || *nombre == '"') {
+		if (*nombre == ' ' || *nombre == '"' || *nombre == '!' 
+				|| *nombre == '.') {
 			*nombre = '_';
 		}
 		nombre++;
@@ -237,6 +238,16 @@ int insertar_ctereal_en_ts(float flotante)
 	strcat(nombre, "_");
 	strcat(nombre, valor);
 	
+	char *original = nombre;
+	while (*nombre != '\0')
+	{
+		if (*nombre == '.') {
+			*nombre = '_';
+		}
+		nombre++;
+	};
+	nombre = original;
+
 	if (nombre_existe_en_ts(nombre) == -1)
 		insertar_tabla_simbolos(nombre, "CTE_REAL", valor, "-");
 	return 1;

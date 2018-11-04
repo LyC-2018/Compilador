@@ -282,8 +282,9 @@ average: AVG P_A C_A avg_expresiones C_C P_C {
 												IndAvg = IndExpresionAvg ; // dividir por uno te daria lo mismo y asi te ahorras un terceto
                                                }
                                                else{
-                                                   cantExpAvg = crearTerceto_icc(cantExpAvg, "",""); //este terceto se podria optimizar
-                                                   IndAvg = crearTerceto_cii("/", IndExpresionAvg, cantExpAvg) ; // este seria el resultado del average
+                                                   insertar_cteint_en_ts(cantExpAvg); // lo necesito para el assembler
+												   cantExpAvg = crearTerceto_icc(cantExpAvg, "",""); //este terceto se podria optimizar
+												   IndAvg = crearTerceto_cii("/", IndExpresionAvg, cantExpAvg) ; // este seria el resultado del average
                                                 }
                                                 //saca todo de la pila
                                                 IndExpresionAvg = sacarDePila(&pilaAverage);
@@ -606,7 +607,8 @@ int buscarTipoTS(char* nombreVar) {
 	
 		char *original = nomCte;
 		while(*nomCte != '\0') {
-			if (*nomCte == ' ' || *nomCte == '"') {
+			if (*nomCte == ' ' || *nomCte == '"' || *nomCte == '!' 
+				|| *nomCte == '.') {
 				*nomCte = '_';
 			}
 			nomCte++;
@@ -680,9 +682,13 @@ void genera_asm()
 	FILE* pf_asm;
 	char aux[10];
 	
-	int lista_etiquetas[10];
+	int lista_etiquetas[1000];
 	int cant_etiquetas = 0;
 	char etiqueta_aux[10];
+
+	char ult_op1_cmp[30];
+	strcpy(ult_op1_cmp, "");
+	char op1_guardado[30];
 
 	if((pf_asm = fopen(file_asm, "w")) == NULL)
 	{
@@ -720,8 +726,20 @@ void genera_asm()
 		{
 			if (strcmp(tercetos[i].uno, "READ") != 0 && strcmp(tercetos[i].uno, "WRITE") != 0)
 			{
-				cant_etiquetas++;
-				lista_etiquetas[cant_etiquetas] = atoi(tercetos[i].dos);
+				int found = -1;
+				int j;
+				for (j = 1; j<=cant_etiquetas; j++)
+				{
+					if (lista_etiquetas[j] == atoi(tercetos[i].dos))
+					{
+						found = 1;
+					}
+				}
+				if (found == -1) 
+				{
+					cant_etiquetas++;
+					lista_etiquetas[cant_etiquetas] = atoi(tercetos[i].dos);
+				}
 			}
 		}	
 	}
@@ -806,10 +824,23 @@ void genera_asm()
  		}
 		else {
 			// Expresiones ; Comparaciones ; Asignacion
-			char *op2 = lista_operandos_assembler[cant_op];
+			char *op2 = (char*) malloc(100*sizeof(char));
+			strcpy(op2, lista_operandos_assembler[cant_op]);
 			cant_op--;
-			char *op1 =  lista_operandos_assembler[cant_op];
-			cant_op--;
+
+			char *op1 = (char*) malloc(100*sizeof(char));
+			if (strcmp(tercetos[i].uno, "CMP" ) == 0 && strcmp(ult_op1_cmp, tercetos[i].dos) == 0 )
+			{
+				printf("Terceto cmp del inlist (%s, %s, %s) \n", tercetos[i].uno, tercetos[i].dos, tercetos[i].tres);
+				strcpy(op1, op1_guardado);
+			}
+			else 
+			{
+				strcpy(op1, lista_operandos_assembler[cant_op]); 
+				cant_op--;
+				strcpy(op1_guardado, op1);
+			}
+			printf("Operandos %s y %s \n", op1, op2);
 			
 			if (strcmp(tercetos[i].uno, "=" ) == 0)
 			{
@@ -824,6 +855,8 @@ void genera_asm()
 				fprintf(pf_asm, "\t FFREE ST(0) \t; Vacio ST0\n");
 				fprintf(pf_asm, "\t FSTSW AX \t\t; mueve los bits C a FLAGS\n");
 				fprintf(pf_asm, "\t SAHF \t\t\t;Almacena el registro AH en el registro FLAGS \n");
+
+				strcpy(ult_op1_cmp, tercetos[i].dos);
 			}
 			else
 			{
@@ -926,7 +959,8 @@ char* getNombreAsm(char *cte_o_id) {
 	
 		char *original = nomCte;
 		while(*nomCte != '\0') {
-			if (*nomCte == ' ' || *nomCte == '"') {
+			if (*nomCte == ' ' || *nomCte == '"' || *nomCte == '!' 
+				|| *nomCte == '.') {
 				*nomCte = '_';
 			}
 			nomCte++;
