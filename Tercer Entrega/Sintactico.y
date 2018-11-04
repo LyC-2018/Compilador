@@ -831,7 +831,6 @@ void genera_asm()
 			char *op1 = (char*) malloc(100*sizeof(char));
 			if (strcmp(tercetos[i].uno, "CMP" ) == 0 && strcmp(ult_op1_cmp, tercetos[i].dos) == 0 )
 			{
-				printf("Terceto cmp del inlist (%s, %s, %s) \n", tercetos[i].uno, tercetos[i].dos, tercetos[i].tres);
 				strcpy(op1, op1_guardado);
 			}
 			else 
@@ -840,7 +839,6 @@ void genera_asm()
 				cant_op--;
 				strcpy(op1_guardado, op1);
 			}
-			printf("Operandos %s y %s \n", op1, op2);
 			
 			if (strcmp(tercetos[i].uno, "=" ) == 0)
 			{
