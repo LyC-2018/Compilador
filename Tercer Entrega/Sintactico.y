@@ -745,7 +745,23 @@ void genera_asm()
 				// Siempre inserto nueva linea despues de mostrar msj
 				fprintf(pf_asm, "\t newLine \n");
 			}
-		}
+			else if (strcmp("READ", tercetos[i].uno) == 0) 
+			{
+				int tipo = buscarTipoTS(tercetos[atoi(tercetos[i].dos)].uno);
+				if (tipo == Float) 
+				{
+					fprintf(pf_asm, "\t GetFloat %s\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+				} 
+				else if (tipo == Integer) 
+				{
+					fprintf(pf_asm, "\t GetInteger %s\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+				}	
+				else 
+				{
+					fprintf(pf_asm, "\t GetString %s\n", getNombreAsm(tercetos[atoi(tercetos[i].dos)].uno));
+				}
+			}
+ 		}
 		else {
 			// Expresiones ; Comparaciones
 		}
