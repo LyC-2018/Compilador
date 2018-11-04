@@ -680,6 +680,10 @@ void genera_asm()
 	FILE* pf_asm;
 	char aux[10];
 	
+	int lista_etiquetas[10];
+	int cant_etiquetas = 0;
+	char etiqueta_aux[10];
+
 	if((pf_asm = fopen(file_asm, "w")) == NULL)
 	{
 		printf("Error al generar el asembler \n");
@@ -704,7 +708,7 @@ void genera_asm()
     fprintf(pf_asm, "\t FNINIT \n");;
     fprintf(pf_asm, "\n");
 
-	int i;
+	int i, j;
 	int opSimple,  // Formato terceto (x,  ,  ) 
 		opUnaria,  // Formato terceto (x, x,  )
 		opBinaria; // Formato terceto (x, x, x)
@@ -723,6 +727,15 @@ void genera_asm()
 			opUnaria = 0;
 			opBinaria = 1;
 		}
+
+		for (j=1;j<=cant_etiquetas;j++) {
+			if (i == lista_etiquetas[j])
+			{
+				sprintf(etiqueta_aux, "ETIQ_%d", lista_etiquetas[j]);
+				fprintf(pf_asm, "%s: \n", etiqueta_aux);
+			}
+		}
+
 
 		if (opSimple == 1) {
 			// Ids, constantes
@@ -769,8 +782,11 @@ void genera_asm()
 			else // saltos
 			{
 				char *codigo = getCodOp(tercetos[i].uno);
-				printf("Codigo conseguido %s \n", codigo);
-				//crearEtiqueta(tercetos[i].dos);
+				cant_etiquetas++;
+				lista_etiquetas[cant_etiquetas] = atoi(tercetos[i].dos); 
+				sprintf(etiqueta_aux, "ETIQ_%d", atoi(tercetos[i].dos));
+				fflush(pf_asm); 
+				fprintf(pf_asm, "\t %s %s \t;Si cumple la condicion salto a la etiqueta\n", codigo, etiqueta_aux);
 			}
  		}
 		else {
@@ -779,12 +795,20 @@ void genera_asm()
 			cant_op--;
 			char *op1 =  lista_operandos_assembler[cant_op];
 			cant_op--;
-			printf("Uso %s y %s\n", op1, op2);
-
+			
 			if (strcmp(tercetos[i].uno, "=" ) == 0)
 			{
 				fprintf(pf_asm, "\t FLD %s \t;Cargo valor \n", getNombreAsm(op1));
 				fprintf(pf_asm, "\t FSTP %s \t; Se lo asigno a la variable que va a guardar el resultado \n", getNombreAsm(op2));
+			}
+			else if (strcmp(tercetos[i].uno, "CMP" ) == 0)
+			{
+				fprintf(pf_asm, "\t FLD %s\t\t;comparacion, operando1 \n", getNombreAsm(op1));
+				fprintf(pf_asm, "\t FLD %s\t\t;comparacion, operando2 \n", getNombreAsm(op2));
+				fprintf(pf_asm, "\t FCOMP\t\t;Comparo \n");
+				fprintf(pf_asm, "\t FFREE ST(0) \t; Vacio ST0\n");
+				fprintf(pf_asm, "\t FSTSW AX \t\t; mueve los bits C a FLAGS\n");
+				fprintf(pf_asm, "\t SAHF \t\t\t;Almacena el registro AH en el registro FLAGS \n");
 			}
 			else
 			{
