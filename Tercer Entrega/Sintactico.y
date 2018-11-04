@@ -132,7 +132,6 @@ int String = 3;
 
 /**** Inicio assembler ****/
 void genera_asm();
-void generaSegmDatosAsm(FILE*);
 char* getNombreAsm(char *cte_o_id);
 char* getCodOp(char*);
 /**** Fin assembler ****/
@@ -689,6 +688,9 @@ void genera_asm()
 	 fprintf(pf_asm, ".386\n");
 	 fprintf(pf_asm, ".STACK 200h \n");
 
+	 generaSegmDatosAsm(pf_asm);
+
+	 fprintf(pf_asm, "\n");
 	 fprintf(pf_asm, ".CODE \n");
 	 fprintf(pf_asm, "MAIN:\n");
 	 fprintf(pf_asm, "\n");
@@ -752,47 +754,12 @@ void genera_asm()
 	/*generamos el final */
 	fprintf(pf_asm, "\t mov AX, 4C00h \t ; Genera la interrupcion 21h\n");
 	fprintf(pf_asm, "\t int 21h \t ; Genera la interrupcion 21h\n");
-
-	generaSegmDatosAsm(pf_asm);
+	
 
 	fprintf(pf_asm, "END MAIN\n");
 	fclose(pf_asm);
 
 
-}
-
-/************************************************************************************************************/
-void generaSegmDatosAsm(FILE* pf_asm)
-{
-	int i;
-
-	fprintf(pf_asm, "\n.DATA \n");
-
-
-	/*for(i=0; i<getCountTS(); i++)
-	{
-
-			if(!strcmp(getTipo(i), "REAL")||!strcmp(getTipo(i), "INT"))
-			{
-				fprintf(pf_asm, "\t%s dd ?\t;Declaracion de Variable Numerica\n", getNombreAsm(i));
-			}
-			else if(!strcmp(getTipo(i), "STR"))
-			{
-				fprintf(pf_asm, "\t%s db 30 dup (?),\"$\"\t;Declaracion de Variable String\n", getNombreAsm(i));
-			}
-			else if(!strcmp(getTipo(i), "CTE_STRING")||!strcmp(getTipo(i), "CONSSTRING"))
-			{
-				fprintf(pf_asm, "\t%s db \"%s\", \"$\", 30 dup (?)\t;Declaracion de Constant String\n", getNombreAsm(i), getValor(i));
-			}
-			else if(!strcmp(getTipo(i), "CTE_REAL")||!strcmp(getTipo(i), "CTE_INT")||!strcmp(getTipo(i), "CONSNUMBER"))
-			{
-				if(strstr(getValor(i),".")){
-					fprintf(pf_asm, "\t%s dd %s\t;Declaracion de Constant Number\n", getNombreAsm(i), getValor(i));
-				}else{
-					fprintf(pf_asm, "\t%s dd %s.0\t;Declaracion de Constant Number\n", getNombreAsm(i), getValor(i));
-				}
-			}
-		}*/
 }
 
 /************************************************************************************************************/

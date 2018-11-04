@@ -45,6 +45,8 @@ void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual
 
 int tipoDeDato(int pos);
 
+void generaSegmDatosAsm(FILE* pf_asm);
+
 %}
 
 %option noyywrap
@@ -359,3 +361,41 @@ void guardarTipos(int variableActual, char listaVariables[][20], char tipoActual
 	}
   }
 }
+
+/*
+	Generacion segmento datos a partir de la ts
+*/
+void generaSegmDatosAsm(FILE* pf_asm)
+{
+	int i;
+
+	fprintf(pf_asm, "\n.DATA \n");
+
+
+	for(i=0; i<cant_reg; i++)
+	{
+		struct registro_ts reg = tabla_simbolos[i];
+		int tipo = tipoDeDato(i);
+		if(strcmpi(reg.tipo, "REAL") == 0 || strcmpi(reg.tipo, "INT") == 0)
+		{
+			fprintf(pf_asm, "\t%s dd ?\t ; Declaracion de Variable Numerica\n", getNombreAsm(reg.nombre));
+		}
+		else if(strcmpi(reg.tipo, "STRING") == 0)
+		{
+			fprintf(pf_asm, "\t%s db 30 dup (?),\"$\"\t;Declaracion de Variable String\n", getNombreAsm(reg.nombre));
+		}
+		else if(strcmpi(reg.tipo, "CTE_STRING") == 0)
+		{
+			fprintf(pf_asm, "\t%s db %s, \"$\", 30 dup (?)\t;Declaracion de Constant String\n", getNombreAsm(reg.nombre), reg.valor);
+		}
+		else if(strcmpi(reg.tipo, "CTE_INT") == 0 || strcmpi(reg.tipo, "CTE_REAL") == 0)
+		{
+			if(strstr(reg.valor,".")){
+				fprintf(pf_asm, "\t%s dd %s\t;Declaracion de Constant Number\n", getNombreAsm(reg.nombre), reg.valor);
+			}else{
+				fprintf(pf_asm, "\t%s dd %s.0\t;Declaracion de Constant Number\n", getNombreAsm(reg.nombre), reg.valor);
+			}
+		}
+	}
+}
+
