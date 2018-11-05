@@ -718,6 +718,7 @@ void genera_asm()
 	int opSimple,  // Formato terceto (x,  ,  ) 
 		opUnaria,  // Formato terceto (x, x,  )
 		opBinaria; // Formato terceto (x, x, x)
+	int agregar_etiqueta_final_nro = -1;
 	
 	// Guardo todos los tercetos donde tendría que poner etiquetas
 	for(i = 0; i < terceto_index; i++)
@@ -818,6 +819,10 @@ void genera_asm()
 			{
 				char *codigo = getCodOp(tercetos[i].uno);
 				sprintf(etiqueta_aux, "ETIQ_%d", atoi(tercetos[i].dos));
+				if (atoi(tercetos[i].dos) >= terceto_index) 
+				{
+					agregar_etiqueta_final_nro = atoi(tercetos[i].dos);
+				}
 				fflush(pf_asm); 
 				fprintf(pf_asm, "\t %s %s \t;Si cumple la condicion salto a la etiqueta\n", codigo, etiqueta_aux);
 			}
@@ -875,6 +880,10 @@ void genera_asm()
 		}
 	}
 
+	if(agregar_etiqueta_final_nro != -1) {
+		sprintf(etiqueta_aux, "ETIQ_%d", agregar_etiqueta_final_nro);
+		fprintf(pf_asm, "%s: \n", etiqueta_aux);
+	}
 
 	/*generamos el final */
 	fprintf(pf_asm, "\t mov AX, 4C00h \t ; Genera la interrupcion 21h\n");
