@@ -164,8 +164,11 @@ int insertar_cteint_en_ts(int entero)
 	strcat(nombre, "_");
 	strcat(nombre, valor);
 	
+	char *longitud = (char*) malloc(10*sizeof(char));	
+	itoa(strlen(valor), longitud, 10);
+
 	if (nombre_existe_en_ts(nombre) == -1)
-		insertar_tabla_simbolos(nombre, "CTE_INT", valor, "-");
+		insertar_tabla_simbolos(nombre, "CTE_INT", valor, longitud);
 	return 1;
 }
 
@@ -248,8 +251,11 @@ int insertar_ctereal_en_ts(float flotante)
 	};
 	nombre = original;
 
+	char *longitud = (char*) malloc(10*sizeof(char));	
+	itoa(strlen(valor), longitud, 10);
+
 	if (nombre_existe_en_ts(nombre) == -1)
-		insertar_tabla_simbolos(nombre, "CTE_REAL", valor, "-");
+		insertar_tabla_simbolos(nombre, "CTE_REAL", valor, longitud);
 	return 1;
 }
 
