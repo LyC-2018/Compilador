@@ -163,7 +163,7 @@ char *strVal;
 
 %%
 
-start: programa { genera_asm(); printf("\n\n\tCOMPILACION EXITOSA!!\n\n\n"); }
+start: programa { printf("\nGenerando assembler...\n"); genera_asm(); printf("\n\tCOMPILACION EXITOSA!!\n\n\n"); }
 	 |			{ printf("\n El archivo 'Prueba.Txt' no tiene un programa\n"); }
 	 ;
 
@@ -862,12 +862,22 @@ void genera_asm()
 			}
 			else if (strcmp(tercetos[i].uno, "CMP" ) == 0)
 			{
-				fprintf(pf_asm, "\t FLD %s\t\t;comparacion, operando1 \n", getNombreAsm(op1));
-				fprintf(pf_asm, "\t FLD %s\t\t;comparacion, operando2 \n", getNombreAsm(op2));
-				fprintf(pf_asm, "\t FCOMP\t\t;Comparo \n");
-				fprintf(pf_asm, "\t FFREE ST(0) \t; Vacio ST0\n");
-				fprintf(pf_asm, "\t FSTSW AX \t\t; mueve los bits C a FLAGS\n");
-				fprintf(pf_asm, "\t SAHF \t\t\t;Almacena el registro AH en el registro FLAGS \n");
+				int tipo = buscarTipoTS(op1);
+				if (tipo == Float | tipo == Integer) 
+				{
+					fprintf(pf_asm, "\t FLD %s\t\t;comparacion, operando1 \n", getNombreAsm(op1));
+					fprintf(pf_asm, "\t FLD %s\t\t;comparacion, operando2 \n", getNombreAsm(op2));
+					fprintf(pf_asm, "\t FCOMP\t\t;Comparo \n");
+					fprintf(pf_asm, "\t FFREE ST(0) \t; Vacio ST0\n");
+					fprintf(pf_asm, "\t FSTSW AX \t\t; mueve los bits C a FLAGS\n");
+					fprintf(pf_asm, "\t SAHF \t\t\t;Almacena el registro AH en el registro FLAGS \n");
+				}
+				else
+				{
+					fprintf(pf_asm, "\t mov si,OFFSET %s \t;Cargo operando1\n", getNombreAsm(op1));
+					fprintf(pf_asm, "\t mov di,OFFSET %s \t; cargo operando2 \n", getNombreAsm(op2));
+					fprintf(pf_asm, "\t STRCMP\t; llamo a la macro para comparar \n");	
+				}
 
 				strcpy(ult_op1_cmp, tercetos[i].dos);
 			}

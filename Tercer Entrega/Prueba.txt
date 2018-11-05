@@ -28,12 +28,18 @@ WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34) ; 40]) AND b == 1)
     ENDIF
 ENDWHILE
 
+E = "Hola"
 IF (E != "Holaa    Mundo")
-D = E
-ELSE
     E = D
+    WRITE "Ingrese una cadena"
     READ E      -/ lectura de variable -/ READ X /- entrada /-
+ELSE
+    D = E
 ENDIF
+
+a = 2 + 1
+WRITE "Dos mas uno es"
+WRITE a
 
 WRITE "Variable ingresada"
 WRITE E
