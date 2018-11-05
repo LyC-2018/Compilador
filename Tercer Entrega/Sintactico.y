@@ -847,8 +847,18 @@ void genera_asm()
 			
 			if (strcmp(tercetos[i].uno, "=" ) == 0)
 			{
-				fprintf(pf_asm, "\t FLD %s \t;Cargo valor \n", getNombreAsm(op1));
-				fprintf(pf_asm, "\t FSTP %s \t; Se lo asigno a la variable que va a guardar el resultado \n", getNombreAsm(op2));
+				int tipo = buscarTipoTS(tercetos[atoi(tercetos[i].dos)].uno);
+				if (tipo == Float | tipo == Integer) // Si se quiere separar integer hay que ver tambien las expresiones
+				{
+					fprintf(pf_asm, "\t FLD %s \t;Cargo valor \n", getNombreAsm(op1));
+					fprintf(pf_asm, "\t FSTP %s \t; Se lo asigno a la variable que va a guardar el resultado \n", getNombreAsm(op2));
+				}
+				else
+				{
+					fprintf(pf_asm, "\t mov si,OFFSET %s \t;Cargo en si el origen\n", getNombreAsm(op1));
+					fprintf(pf_asm, "\t mov di,OFFSET %s \t; cargo en di el destino \n", getNombreAsm(op2));
+					fprintf(pf_asm, "\t STRCPY\t; llamo a la macro para copiar \n");
+				}	
 			}
 			else if (strcmp(tercetos[i].uno, "CMP" ) == 0)
 			{

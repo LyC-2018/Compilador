@@ -158,8 +158,89 @@ beep                    macro                    ;beeps speaker
                         popa
 
 endm
+
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+STRCPY MACRO
+LOCAL @@OK
+	STRLEN
+	CMP BX, 31
+	JLE @@OK
+	MOV BX, 31
+@@OK:
+	MOV CX, BX
+	CLD
+	REP MOVSB
+	MOV AL, '$'
+	MOV BYTE PTR[DI], AL
+ENDM
+
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+STRLEN MACRO
+LOCAL @@STRL01, @@STREND
+	;DEJA EN BX LA CANTIDAD DE CARACTERES DE UNA CADENA
+	MOV BX, 0
+@@STRL01:
+	CMP BYTE PTR[SI + BX], '$'
+	JE @@STREND
+	INC BX
+	JMP @@STRL01
+@@STREND:
+	NOP
+ENDM  
   
-  
+STRCAT MACRO
+LOCAL @@CONCATSIZEMAL, @@CONCATSIZEOK, @@CONCATSIGO
+	PUSH DS
+	PUSH SI
+	STRLEN
+	MOV DX, BX
+	MOV SI, DI
+	PUSH ES
+	POP DS
+	STRLEN
+	ADD DI, BX
+	ADD BX, DX
+	CMP BX, 31
+	JG @@CONCATSIZEMAL
+@@CONCATSIZEOK:
+	MOV CX, DX
+	JMP @@CONCATSIGO
+@@CONCATSIZEMAL:
+	SUB BX, 31
+	SUB DX, BX
+	MOV CX, DX
+@@CONCATSIGO:
+	PUSH DS
+	POP ES
+	POP SI
+	POP DS
+	CLD
+	REP MOVSB
+	MOV AL,'$'
+	MOV BYTE PTR [DI], AL
+ENDM
  
-  
+STRCMP MACRO
+LOCAL @@CICLO, @@NOTEQUAL, @@BYE
+    DEC DI
+
+@@CICLO:
+    INC DI 			;DS:DI -> SIGUIENTE CHAR EN CAD2
+    LODSB 			;CARGA AL CON EL SIGUIENTE CHAR DE CAD1
+    CMP [DI], AL 	;COMPARA CHARS
+    JNE @@NOTEQUAL 	;SALTA DEL LOOP SI NO SON LOS MISMOS
+    CMP AL, '$' 	;SON LOS MISMOS, VERIFICA EOF
+    JNE @@CICLO 		;NO ES EOF, PASA A LOS SIGUIENTES
+
+    MOV BL, 0
+	TEST BL, BL
+    JMP @@BYE 		;LOS STRING SON IGUALES (ZF = 1)
+@@NOTEQUAL:
+    MOV BL, 1		;LOS STRING NO SON IGUALES (ZF = 0)
+	TEST BL, BL
+@@BYE:
+	NOP
+ENDM 
   

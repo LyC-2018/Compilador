@@ -8,10 +8,11 @@ ENDDEC
 a = (5 * 8)
 WRITE a
 
-c = 3.0
-WHILE (AVG([c, 2.3]) == 2.3 OR 1==1)
+c = 2.3
+WHILE (AVG([c, 2.3]) == 2.3 OR a==40)
     c = c - 0.1 
     WRITE c
+    a = 3
 ENDWHILE
 
 IF (((2 * 1) - 1) == 1 )
@@ -28,7 +29,7 @@ WHILE (INLIST (a, [2*b+7 ; 12 ; a+b*(34) ; 40]) AND b == 1)
 ENDWHILE
 
 IF (E != "Holaa    Mundo")
-    D = E
+D = E
 ELSE
     E = D
     READ E      -/ lectura de variable -/ READ X /- entrada /-
