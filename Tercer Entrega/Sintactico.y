@@ -138,6 +138,13 @@ void genera_asm();
 char* getNombreAsm(char *cte_o_id);
 char* getCodOp(char*);
 /**** Fin assembler ****/
+
+/**** Inicio archivo de reglas ****/
+char lista_reglas[1000][300];
+int cant_reglas;
+void insertar_regla(char* regla);
+void generar_archivo_reglas();
+/**** Fin archivo de reglas ****/
 %}
 
 %union {
@@ -163,46 +170,47 @@ char *strVal;
 
 %%
 
-start: programa { printf("\nGenerando assembler...\n"); genera_asm(); printf("\n\tCOMPILACION EXITOSA!!\n\n\n"); }
+start: programa { printf("\nGenerando assembler...\n"); genera_asm(); printf("\n\tCOMPILACION EXITOSA!!\n\n\n"); insertar_regla("start -> programa"); }
 	 |			{ printf("\n El archivo 'Prueba.Txt' no tiene un programa\n"); }
 	 ;
 
-programa: declaracion { printf("Declaracion OK\n"); } bloque
-        | bloque
+programa: declaracion { printf("Declaracion OK\n"); } bloque { insertar_regla("programa -> declaracion"); }
+        | bloque { insertar_regla("programa -> bloque"); }
 		;
 
-declaracion: DECVAR variables ENDDEC
-		   | DECVAR ENDDEC
+declaracion: DECVAR variables ENDDEC { insertar_regla("declaracion -> DECVAR variables ENDDEC"); }
+		   | DECVAR ENDDEC { insertar_regla("declaracion -> DECVAR ENDEC"); }
 		   ;
 
-variables: variables listavar DOS_PUNTOS tipo { guardarTipos(variableActual, listaVariables, tipoActual); reinicioVariables(); }
-	     | listavar DOS_PUNTOS tipo { guardarTipos(variableActual, listaVariables, tipoActual); reinicioVariables(); }
+variables: variables listavar DOS_PUNTOS tipo { guardarTipos(variableActual, listaVariables, tipoActual); reinicioVariables(); insertar_regla("variables -> variables listavar DOS_PUNTOS tipo"); }
+	     | listavar DOS_PUNTOS tipo { guardarTipos(variableActual, listaVariables, tipoActual); reinicioVariables(); insertar_regla("variables -> listavar DOS_PUNTOS tipo"); }
          ;
 
-listavar: listavar COMA ID { strcpy(listaVariables[variableActual++],$3); insertar_id_en_ts($3); }
-	    | ID { strcpy(listaVariables[variableActual++],$1); insertar_id_en_ts($1); }
+listavar: listavar COMA ID { strcpy(listaVariables[variableActual++],$3); insertar_id_en_ts($3); insertar_regla("listavar -> listavar COMA ID"); }
+	    | ID { strcpy(listaVariables[variableActual++],$1); insertar_id_en_ts($1); insertar_regla("listavar -> ID"); }
         ;
 
-tipo: INT    { strcpy(tipoActual,"INT"); }
-    | FLOAT  { strcpy(tipoActual,"REAL"); }
-	| STRING { strcpy(tipoActual,"STRING"); }
+tipo: INT    { strcpy(tipoActual,"INT"); insertar_regla("tipo -> INT"); }
+    | FLOAT  { strcpy(tipoActual,"REAL"); insertar_regla("tipo -> FLOAT"); }
+	| STRING { strcpy(tipoActual,"STRING"); insertar_regla("tipo -> STRING"); }
 	;
 
-bloque: sentencia
-	  | bloque sentencia
+bloque: sentencia { insertar_regla("bloque -> sentencia"); }
+	  | bloque sentencia { insertar_regla("bloque -> bloque sentencia"); }
 	  ;
 
-sentencia: asignacion { printf("Asignacion OK\n"); }
-		 | iteracion  { printf("Iteracion OK\n"); }
-		 | decision   { printf("Decision OK\n"); }
-		 | entrada    { printf("Entrada OK\n"); }
-		 | salida     { printf("Salida OK\n"); }
+sentencia: asignacion { printf("Asignacion OK\n"); insertar_regla("sentencia -> asignacion"); }
+		 | iteracion  { printf("Iteracion OK\n"); insertar_regla("sentencia -> iteracion"); }
+		 | decision   { printf("Decision OK\n"); insertar_regla("sentencia -> decision"); }
+		 | entrada    { printf("Entrada OK\n"); insertar_regla("sentencia -> entrada"); }
+		 | salida     { printf("Salida OK\n"); insertar_regla("sentencia -> salida"); }
 		 ;
 
 asignacion: ID ASIG expresion { int tipo = buscarTipoTS($1);
 								verificarTipoDato(tipo);
 								reiniciarTipoDato();
 								IndAsignacion = crearTerceto_cii("=", crearTerceto_ccc($1, "",""), IndExpresion);
+								insertar_regla("asignacion -> ID ASIG expresion"); 
 							  }
 		  ;
 
@@ -217,11 +225,12 @@ iteracion: WHILE P_A { while_guardar_pos(terceto_index); }
 				while_index--;
 				completar_salto_si_es_comparacion_AND(terceto_index);
 				completar_salto_si_es_inlist_negado(terceto_index);
+				insertar_regla("iteracion -> WHILE P_A condicion P_C bloque ENDWHILE"); 
 				}
 		 ;
 
 decision: IF P_A condicion P_C { if(strcmp(valor_comparacion, "") != 0) if_guardar_salto(crearTerceto_ccc(valor_comparacion, "", "")); else if_index++; }
-			 decision_bloque
+			 decision_bloque { insertar_regla("decision -> IF P_A condicion P_C decision_bloque"); }
 		;
 
 decision_bloque:
@@ -229,17 +238,18 @@ decision_bloque:
 			if_completar_ultimo_salto_guardado_con(terceto_index);
 			completar_salto_si_es_comparacion_AND(terceto_index);
 			completar_salto_si_es_inlist_negado(terceto_index);
+			insertar_regla("decision_bloque -> bloque ENDIF"); 
 			}
 		| bloque { if_completar_ultimo_salto_guardado_con(terceto_index+1);
 			       completar_salto_si_es_comparacion_AND(terceto_index+1);
 				   if_guardar_salto(crearTerceto_ccc("BI", "",""));
 				   completar_salto_si_es_inlist_negado(terceto_index);
 				}
-		  ELSE bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); }
+		  ELSE bloque ENDIF { if_completar_ultimo_salto_guardado_con(terceto_index); insertar_regla("decision_bloque -> bloque ELSE bloque ENDIF"); }
 		;
 
-condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; guardar_condicion_no_tiene_inlist_negado(); }
-         | comparacion { and_index++; saltos_and_a_completar[and_index] = crearTerceto_ccc(valor_comparacion, "", "");  guardar_condicion_no_tiene_inlist_negado(); } AND comparacion
+condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; guardar_condicion_no_tiene_inlist_negado(); insertar_regla("condicion -> comparacion"); }
+         | comparacion { and_index++; saltos_and_a_completar[and_index] = crearTerceto_ccc(valor_comparacion, "", "");  guardar_condicion_no_tiene_inlist_negado(); } AND comparacion { insertar_regla("condicion -> comparacion AND comparacion"); }
 		 | comparacion {
 				and_index++; saltos_and_a_completar[and_index] = -1;
 				crearTerceto_cic(valor_comparacion, terceto_index+2, ""); // salto a la prox comparación
@@ -251,29 +261,36 @@ condicion: comparacion { and_index++; saltos_and_a_completar[and_index] = -1; gu
 				itoa(terceto_index+1, salto, 10);
 				tercetos[pos_a_completar_OR].dos = (char*) malloc(sizeof(char)*strlen(salto));
 				strcpy(tercetos[pos_a_completar_OR].dos, salto);
+				insertar_regla("condicion -> comparacion OR comparacion"); 
 			}
-		 | NOT { guardar_condicion_no_tiene_inlist_negado(); es_negado = 1; } comparacion { es_negado = 0; };
+		 | NOT { guardar_condicion_no_tiene_inlist_negado(); es_negado = 1; } comparacion { es_negado = 0; insertar_regla("condicion -> NOT comparacion");  };
 		 ;
 
 comparacion: expresion { IndComparacion = IndExpresion; } MENOR expresion { reiniciarTipoDato(); crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 				if(es_negado == 0) { strcpy(valor_comparacion, "BGE"); } else { strcpy(valor_comparacion, "BLT"); }
+			 	insertar_regla("comparacion -> expresion MENOR expresion"); 
 			 }
 		   | expresion { IndComparacion = IndExpresion; } MENOR_IGUAL expresion { reiniciarTipoDato(); crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 				if(es_negado == 0) { strcpy(valor_comparacion, "BGT"); } else { strcpy(valor_comparacion, "BLE"); }
+			 	insertar_regla("comparacion -> expresion MENOR_IGUAL expresion"); 
 			 }
 		   | expresion { IndComparacion = IndExpresion; } MAYOR expresion       { reiniciarTipoDato(); crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 		   		if(es_negado == 0) { strcpy(valor_comparacion, "BLE"); } else { strcpy(valor_comparacion, "BGT"); }
+				insertar_regla("comparacion -> expresion MAYOR expresion"); 
 			 }
 		   | expresion { IndComparacion = IndExpresion; } MAYOR_IGUAL expresion { reiniciarTipoDato(); crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 		   		if(es_negado == 0) { strcpy(valor_comparacion, "BLT"); } else { strcpy(valor_comparacion, "BGE"); }
+				insertar_regla("comparacion -> expresion MAYOR_IGUAL expresion"); 
 			 }
 		   | expresion { IndComparacion = IndExpresion; } IGUAL expresion       { reiniciarTipoDato(); crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 		   		if(es_negado == 0) { strcpy(valor_comparacion, "BNE"); } else { strcpy(valor_comparacion, "BEQ"); }
+			 	insertar_regla("comparacion -> expresion IGUAL expresion"); 
 			 }
 		   | expresion { IndComparacion = IndExpresion; } DISTINTO expresion    { reiniciarTipoDato(); crearTerceto_cii("CMP", IndComparacion, IndExpresion);
 		   		if(es_negado == 0) { strcpy(valor_comparacion, "BEQ"); } else { strcpy(valor_comparacion, "BNE"); }
+			 	insertar_regla("comparacion -> expresion DISTINTO expresion"); 
 			 }
-		   | inlist { if (es_negado == 0) { strcpy(valor_comparacion, "BI"); } else { strcpy(valor_comparacion, ""); inlist_negados[index_inlist_negados].tiene_inlist_negado = 1; } }
+		   | inlist { if (es_negado == 0) { strcpy(valor_comparacion, "BI"); } else { strcpy(valor_comparacion, ""); inlist_negados[index_inlist_negados].tiene_inlist_negado = 1; } insertar_regla("comparacion -> inlist"); }
 		   ;
 
 average: AVG P_A C_A avg_expresiones C_C P_C { 
@@ -291,6 +308,7 @@ average: AVG P_A C_A avg_expresiones C_C P_C {
                                                 cantExpAvg = sacarDePila(&pilaCantExpAvg);
                                                 IndExpresion = sacarDePila(&pilaExpresion);
                                                 IndTermino = sacarDePila(&pilaTermino);
+												insertar_regla("average -> AVG P_A C_A avg_expresiones C_C P_C"); 
                                             }
 		;
 
@@ -304,11 +322,13 @@ avg_expresiones: { // pone todo en la pila antes de entrar al average para que n
 							 reiniciarTipoDato();
 							 IndExpresionAvg = IndExpresion; // el subtotal va  a ser el primer numero
                              cantExpAvg = 1;
-                           }
+							 insertar_regla("avg_expresiones -> expresion"); 
+						   }
 			     | avg_expresiones  COMA expresion {
 													 reiniciarTipoDato();
 													 IndExpresionAvg = crearTerceto_cii("+", IndExpresionAvg, IndExpresion); //el subtotal va a ser el subtotal anterior mas la expresion actual
                                                      cantExpAvg++;
+													 insertar_regla("avg_expresiones -> avg_expresiones COMA expresion"); 
                                                    }
 			   ;
 
@@ -328,6 +348,7 @@ inlist: INLIST P_A ID {
 													tercetos[inlist_saltos_a_completar[i]].dos = salto;
 												}
 											}
+											insertar_regla("inlist -> INLIST P_A ID COMA C_A inlist_expresiones C_C P_C"); 
 										}
 	  ;
 
@@ -342,7 +363,7 @@ inlist_expresiones: expresion {
 									inlist_negados[index_inlist_negados].cantidad_saltos = inlist_cant_saltos;
 									inlist_negados[index_inlist_negados].posiciones[inlist_cant_saltos-1] = pos;
 								}
-
+								insertar_regla("inlist_expresiones -> expresion"); 
 								}
 		          | inlist_expresiones PUNTO_COMA expresion {
 																IndInlist = crearTerceto_cii("CMP", inlist_indice_id, IndExpresion);
@@ -353,24 +374,26 @@ inlist_expresiones: expresion {
 																	inlist_negados[index_inlist_negados].cantidad_saltos = inlist_cant_saltos;
 																	inlist_negados[index_inlist_negados].posiciones[inlist_cant_saltos-1] = pos;
 																}
+																insertar_regla("inlist_expresiones -> inlist_expresiones PUNTO_COMA expresion"); 
 															}
 		          ;
 
-expresion: expresion OP_SUMA termino  { IndExpresion = crearTerceto_cii("+", IndExpresion, IndTermino); }
-		 | expresion OP_RESTA termino { IndExpresion = crearTerceto_cii("-", IndExpresion, IndTermino); }
-		 | termino  { IndExpresion = IndTermino; }
+expresion: expresion OP_SUMA termino  { IndExpresion = crearTerceto_cii("+", IndExpresion, IndTermino); insertar_regla("expresion -> expresion OP_SUMA termino"); }
+		 | expresion OP_RESTA termino { IndExpresion = crearTerceto_cii("-", IndExpresion, IndTermino); insertar_regla("expresion -> expresion OP_RESTA termino"); }
+		 | termino  { IndExpresion = IndTermino; insertar_regla("expresion -> termino"); }
 		 ;
 
-termino: termino OP_MULT factor  { IndTermino = crearTerceto_cii("*", IndTermino, IndFactor); }
-	   | termino OP_DIV factor   { IndTermino = crearTerceto_cii("/", IndTermino, IndFactor); }
-	   | factor                  { IndTermino = IndFactor; }
+termino: termino OP_MULT factor  { IndTermino = crearTerceto_cii("*", IndTermino, IndFactor); insertar_regla("termino -> termino OP_MULT factor"); }
+	   | termino OP_DIV factor   { IndTermino = crearTerceto_cii("/", IndTermino, IndFactor); insertar_regla("termino -> termino OP_DIV factor"); }
+	   | factor                  { IndTermino = IndFactor; insertar_regla("termino -> factor"); }
 	   ;
 
 factor: ID	               { int tipo = buscarTipoTS(yylval.strVal);
 							 verificarTipoDato(tipo);
 							 IndFactor = crearTerceto_ccc($1, "", "");
+							 insertar_regla("factor -> ID"); 
 						   }
-	  | constante
+	  | constante { insertar_regla("factor -> constante"); }
 	  
 	  | P_A 			   { ponerEnPila(&pilaTermino, IndTermino);
                              ponerEnPila(&pilaExpresion, IndExpresion);
@@ -379,35 +402,42 @@ factor: ID	               { int tipo = buscarTipoTS(yylval.strVal);
                             IndFactor = IndExpresion;
                             IndExpresion = sacarDePila(&pilaExpresion);
                             IndTermino = sacarDePila(&pilaTermino);
+							insertar_regla("factor -> P_A expresion P_C"); 
                            }
 	  | average            { verificarTipoDato(Float);
 							 printf("AVG OK\n"); IndFactor = IndAvg;
+							 insertar_regla("factor -> average"); 
 						   }
 	  ;
 
 
 constante: CTE_INT    { verificarTipoDato(Integer);
 						IndFactor = crearTerceto_icc($1, "", "");
+						insertar_regla("constante -> CTE_INT"); 
 					  }
-         | CTE_STRING { IndFactor = crearTerceto_ccc($1, "", ""); }
+         | CTE_STRING { IndFactor = crearTerceto_ccc($1, "", ""); insertar_regla("constante -> CTE_STRING"); }
 		 | CTE_REAL   { 
 						verificarTipoDato(Float);
 						IndFactor = crearTerceto_fcc($1, "", "");
+						insertar_regla("constante -> CTE_REAL"); 
 					  }
 		 ;
 
 entrada: READ ID			{ existe_en_ts($2);
 							  IndEntrada = crearTerceto_ccc($2, "", ""); 
 							  crearTerceto_cic("READ",IndEntrada,"");
+							  insertar_regla("entrada -> READ ID"); 
 							}
        ;
 
 salida: WRITE CTE_STRING	{ IndSalida = crearTerceto_ccc($2, "", "");
 							  crearTerceto_cic("WRITE",IndSalida,"");
+							  insertar_regla("salida -> WRITE CTE_STRING"); 
 							}
       | WRITE ID 			{ existe_en_ts($2); 
 	  						  IndSalida = crearTerceto_ccc($2, "", "");
 							  crearTerceto_cic("WRITE",IndSalida,""); 
+							  insertar_regla("salida -> WRITE ID"); 
 							}
 	  ;
 
@@ -430,6 +460,7 @@ int main(int argc,char *argv[])
 	//mostrar_ts();
 	save_reg_ts();
 	save_tercetos();
+	generar_archivo_reglas();
   }
   fclose(yyin);
   return 0;
@@ -1004,4 +1035,29 @@ char* getNombreAsm(char *cte_o_id) {
 	}
 	
 	return nombreAsm;
+}
+
+/*
+	Inserta regla en la lista para dsp imprimir el archivo
+*/
+void insertar_regla(char* regla)
+{
+	//printf("	CANT %d ; REGLA %s \n", cant_reglas, regla);
+	strcpy(lista_reglas[cant_reglas], regla);
+	cant_reglas++;
+}
+
+/*
+	Genera el archivo de reglas
+*/
+void generar_archivo_reglas() 
+{
+	FILE *file = fopen("reglas_consumidas.txt", "w");
+	
+	int i;
+	for(i=0;i<cant_reglas;i++)
+	{
+		fprintf(file, "%s\n", lista_reglas[i]);
+	}
+	fclose(file);
 }
