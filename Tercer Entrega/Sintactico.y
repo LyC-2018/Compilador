@@ -883,6 +883,11 @@ void genera_asm()
 			}
 			else
 			{
+				int tipo = buscarTipoTS(op1);
+				if (tipo == String)
+				{
+					yyerror("Ops! No estan soportadas las operaciones entre cadenas\n");
+				}
 				sprintf(aux, "_aux%d", i); // auxiliar relacionado al terceto
 				insertar_ts_si_no_existe(aux, "REAL", "", "");
 				fflush(pf_asm);
