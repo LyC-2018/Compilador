@@ -1,0 +1,286 @@
+listavar -> ID
+listavar -> listavar COMA ID
+listavar -> listavar COMA ID
+tipo -> INT
+variables -> listavar DOS_PUNTOS tipo
+listavar -> ID
+tipo -> FLOAT
+variables -> variables listavar DOS_PUNTOS tipo
+listavar -> ID
+listavar -> listavar COMA ID
+tipo -> STRING
+variables -> variables listavar DOS_PUNTOS tipo
+declaracion -> DECVAR variables ENDDEC
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+constante -> CTE_INT
+factor -> constante
+termino -> termino OP_MULT factor
+expresion -> termino
+factor -> P_A expresion P_C
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> sentencia
+salida -> WRITE ID
+sentencia -> salida
+bloque -> bloque sentencia
+constante -> CTE_REAL
+factor -> constante
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> bloque sentencia
+factor -> ID
+termino -> factor
+expresion -> termino
+avg_expresiones -> expresion
+constante -> CTE_REAL
+factor -> constante
+termino -> factor
+expresion -> termino
+avg_expresiones -> avg_expresiones COMA expresion
+average -> AVG P_A C_A avg_expresiones C_C P_C
+factor -> average
+termino -> factor
+expresion -> termino
+constante -> CTE_REAL
+factor -> constante
+termino -> factor
+expresion -> termino
+comparacion -> expresion IGUAL expresion
+factor -> ID
+termino -> factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+comparacion -> expresion IGUAL expresion
+condicion -> comparacion OR comparacion
+factor -> ID
+termino -> factor
+expresion -> termino
+constante -> CTE_REAL
+factor -> constante
+termino -> factor
+expresion -> expresion OP_RESTA termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> sentencia
+salida -> WRITE ID
+sentencia -> salida
+bloque -> bloque sentencia
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> bloque sentencia
+iteracion -> WHILE P_A condicion P_C bloque ENDWHILE
+sentencia -> iteracion
+bloque -> bloque sentencia
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+constante -> CTE_INT
+factor -> constante
+termino -> termino OP_MULT factor
+expresion -> termino
+factor -> P_A expresion P_C
+termino -> factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> expresion OP_RESTA termino
+factor -> P_A expresion P_C
+termino -> factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+comparacion -> expresion IGUAL expresion
+condicion -> comparacion
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+avg_expresiones -> expresion
+factor -> ID
+termino -> factor
+expresion -> termino
+factor -> ID
+termino -> factor
+expresion -> expresion OP_SUMA termino
+avg_expresiones -> avg_expresiones COMA expresion
+factor -> ID
+termino -> factor
+expresion -> termino
+avg_expresiones -> avg_expresiones COMA expresion
+average -> AVG P_A C_A avg_expresiones C_C P_C
+factor -> average
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> sentencia
+decision_bloque -> bloque ENDIF
+decision -> IF P_A condicion P_C decision_bloque
+sentencia -> decision
+bloque -> bloque sentencia
+salida -> WRITE CTE_STRING
+sentencia -> salida
+bloque -> bloque sentencia
+salida -> WRITE ID
+sentencia -> salida
+bloque -> bloque sentencia
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+factor -> ID
+termino -> termino OP_MULT factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> expresion OP_SUMA termino
+inlist_expresiones -> expresion
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+inlist_expresiones -> inlist_expresiones PUNTO_COMA expresion
+factor -> ID
+termino -> factor
+expresion -> termino
+factor -> ID
+termino -> factor
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+factor -> P_A expresion P_C
+termino -> termino OP_MULT factor
+expresion -> expresion OP_SUMA termino
+inlist_expresiones -> inlist_expresiones PUNTO_COMA expresion
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+inlist_expresiones -> inlist_expresiones PUNTO_COMA expresion
+inlist -> INLIST P_A ID COMA C_A inlist_expresiones C_C P_C
+comparacion -> inlist
+factor -> ID
+termino -> factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+comparacion -> expresion IGUAL expresion
+condicion -> comparacion AND comparacion
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> sentencia
+factor -> ID
+termino -> factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+comparacion -> expresion IGUAL expresion
+condicion -> comparacion
+factor -> ID
+termino -> factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> expresion OP_SUMA termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> sentencia
+decision_bloque -> bloque ENDIF
+decision -> IF P_A condicion P_C decision_bloque
+sentencia -> decision
+bloque -> bloque sentencia
+iteracion -> WHILE P_A condicion P_C bloque ENDWHILE
+sentencia -> iteracion
+bloque -> bloque sentencia
+constante -> CTE_STRING
+factor -> constante
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> bloque sentencia
+factor -> ID
+termino -> factor
+expresion -> termino
+constante -> CTE_STRING
+factor -> constante
+termino -> factor
+expresion -> termino
+comparacion -> expresion DISTINTO expresion
+condicion -> comparacion
+factor -> ID
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> sentencia
+salida -> WRITE CTE_STRING
+sentencia -> salida
+bloque -> bloque sentencia
+entrada -> READ ID
+sentencia -> entrada
+bloque -> bloque sentencia
+factor -> ID
+termino -> factor
+expresion -> termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> sentencia
+decision_bloque -> bloque ELSE bloque ENDIF
+decision -> IF P_A condicion P_C decision_bloque
+sentencia -> decision
+bloque -> bloque sentencia
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> termino
+constante -> CTE_INT
+factor -> constante
+termino -> factor
+expresion -> expresion OP_SUMA termino
+asignacion -> ID ASIG expresion
+sentencia -> asignacion
+bloque -> bloque sentencia
+salida -> WRITE CTE_STRING
+sentencia -> salida
+bloque -> bloque sentencia
+salida -> WRITE ID
+sentencia -> salida
+bloque -> bloque sentencia
+salida -> WRITE CTE_STRING
+sentencia -> salida
+bloque -> bloque sentencia
+salida -> WRITE ID
+sentencia -> salida
+bloque -> bloque sentencia
+salida -> WRITE CTE_STRING
+sentencia -> salida
+bloque -> bloque sentencia
+programa -> declaracion
+start -> programa
