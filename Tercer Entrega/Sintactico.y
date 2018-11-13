@@ -1052,7 +1052,7 @@ void insertar_regla(char* regla)
 */
 void generar_archivo_reglas() 
 {
-	FILE *file = fopen("reglas_consumidas.txt", "w");
+	FILE *file = fopen("reglas_involucradas.txt", "w");
 	
 	int i;
 	for(i=0;i<cant_reglas;i++)
