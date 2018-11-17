@@ -331,7 +331,7 @@ void insertar_ts_si_no_existe(char *nombre, char *tipo, char *valor, char *longi
 
 void save_reg_ts()
 {
-	FILE *file = fopen("ts.txt", "a");
+	FILE *file = fopen("ts.txt", "w");
 	
 	if(file == NULL) 
 	{
