@@ -534,7 +534,7 @@ int crearTerceto_cic(char *uno, int dos, char *tres) {
 }
 
 void save_tercetos() {
-	FILE *file = fopen("Intermedia.txt", "a");
+	FILE *file = fopen("Intermedia.txt", "w");
 
 	if(file == NULL)
 	{
